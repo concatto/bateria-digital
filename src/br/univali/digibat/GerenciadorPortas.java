@@ -13,12 +13,13 @@ public class GerenciadorPortas {
 	private int dataBits = SerialPort.DATABITS_8;
 	private int stopBits = SerialPort.STOPBITS_1;
 	private int parity = SerialPort.PARITY_NONE;
-	private ByteArrayConsumer consumidor;
+	private int tamanhoMensagem;
 	
+	private ByteArrayConsumer consumidor;
 	private SerialPort porta;
 	
-	public GerenciadorPortas() {
-		
+	public GerenciadorPortas(int tamanhoMensagem) {
+		this.tamanhoMensagem = tamanhoMensagem;
 	}
 	
 	public String[] obterPortas() {
@@ -29,6 +30,7 @@ public class GerenciadorPortas {
 		porta = new SerialPort(nomePorta);
 		if (porta.openPort()) {
 			if (porta.setParams(baudRate, dataBits, stopBits, parity)) {
+				//TODO Heartbeat para o Arduino. Desenvolver um if.
 				aplicarListener();
 				return true;
 			}
@@ -38,7 +40,7 @@ public class GerenciadorPortas {
 	}
 	
 	private void aplicarListener() throws SerialPortException {
-		final ByteBuffer buffer = ByteBuffer.allocate(3);
+		final ByteBuffer buffer = ByteBuffer.allocate(tamanhoMensagem);
 		
 		porta.addEventListener(new SerialPortEventListener() {
 			@Override
@@ -77,6 +79,14 @@ public class GerenciadorPortas {
 				}
 			}
 		});
+	}
+	
+	public void setTamanhoMensagem(int tamanhoMensagem) {
+		this.tamanhoMensagem = tamanhoMensagem;
+	}
+	
+	public int getTamanhoMensagem() {
+		return tamanhoMensagem;
 	}
 	
 	public void setConsumidor(ByteArrayConsumer consumidor) {

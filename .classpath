@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="/home/univali/Downloads/jSSC-2.8.0-Release/jssc.jar" sourcepath="/home/univali/Downloads/jSSC-2.8.0-Release/src/jssc-2.8.0-src.jar">
+	<classpathentry kind="lib" path="lib/jssc.jar" sourcepath="lib/src/jssc-2.8.0-src.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/home/univali/Downloads/jSSC-2.8.0-Release/javadoc/jssc-2.8.0-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/Digibat/lib/javadoc/jssc-2.8.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

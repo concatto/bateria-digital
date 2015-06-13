@@ -7,7 +7,7 @@ public class Controlador {
 	private GerenciadorPortas gerenciador;
 	
 	public Controlador() {
-		gerenciador = new GerenciadorPortas();
+		gerenciador = new GerenciadorPortas(3);
 		userInterface = new UserInterface(this);
 		userInterface.setVisible(true);
 	}
@@ -20,7 +20,11 @@ public class Controlador {
 		String porta = userInterface.getPortaSelecionada();
 		try {
 			boolean sucesso = gerenciador.abrirPorta(porta);
-			if (!sucesso) userInterface.mensagem("Falha ao abrir a porta.");
+			if (sucesso) {
+				alterarInterface(ModoInterface.SENSORES);
+			} else {
+				userInterface.mensagem("Falha ao abrir a porta.");
+			}
 		} catch (SerialPortException e) {
 			userInterface.erro(e);
 			e.printStackTrace();
@@ -29,5 +33,9 @@ public class Controlador {
 	
 	public static void main(String[] args) {
 		new Controlador();
+	}
+
+	public void alterarInterface(ModoInterface modo) {
+		userInterface.alterarModo(modo);
 	}
 }
