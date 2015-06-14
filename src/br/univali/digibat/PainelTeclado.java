@@ -19,12 +19,23 @@ public class PainelTeclado extends PainelSensores {
 		painelEntrada.setLayout(new BorderLayout());
 		painelEntrada.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		painelEntrada.setFocusable(true);
-		final int[] instrumentos = {48, 49, 50, 51, 52, 53, 54, 55, 56};
+		final int[] instrumentos = {
+				Instrumentos.CRASH_CYMBAL,
+				Instrumentos.ACOUSTIC_BASS,
+				Instrumentos.BASS_DRUM,
+				Instrumentos.LOW_TOM,
+				Instrumentos.RIDE_CYMBAL,
+				Instrumentos.SPLASH_CYMBAL,
+				Instrumentos.CHINESE_CYMBAL,
+				Instrumentos.HIGH_FLOOR_TOM,
+				Instrumentos.HI_MID_TOM,
+				Instrumentos.HIGH_TOM
+		};
 		painelEntrada.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				int nota = Character.getNumericValue(e.getKeyChar());
-				if (nota > 0 && nota < instrumentos.length) {
+				if (nota >= 0 && nota < instrumentos.length) {
 					GerenciadorAudio.tocar(instrumentos[nota]);
 				}
 			}
