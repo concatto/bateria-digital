@@ -53,7 +53,7 @@ public class GerenciadorPortas {
 						byte[] end = new byte[buffer.capacity()];
 						buffer.position(0);
 						buffer.get(end);
-						consumidor.accept(end);
+						if (consumidor != null) consumidor.accept(end);
 						
 //						int high = end[end.length - 1] & 0xFF;
 //						int low = end[end.length - 2] & 0xFF;

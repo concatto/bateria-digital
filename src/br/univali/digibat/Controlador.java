@@ -5,6 +5,7 @@ import jssc.SerialPortException;
 public class Controlador {
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
+	private ConsumidorBateria consumidor;
 	
 	public Controlador() {
 		gerenciador = new GerenciadorPortas(3);
@@ -22,6 +23,8 @@ public class Controlador {
 			boolean sucesso = gerenciador.abrirPorta(porta);
 			if (sucesso) {
 				alterarInterface(ModoInterface.SENSORES);
+				consumidor = new ConsumidorBateria();
+				gerenciador.setConsumidor(consumidor);
 			} else {
 				userInterface.mensagem("Falha ao abrir a porta.");
 			}
