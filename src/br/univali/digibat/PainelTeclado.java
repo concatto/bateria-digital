@@ -21,16 +21,19 @@ public class PainelTeclado extends PainelSensores {
 		painelEntrada.setFocusable(true);
 		final int[] instrumentos = {
 				Instrumentos.CRASH_CYMBAL,
-				Instrumentos.ACOUSTIC_BASS,
 				Instrumentos.BASS_DRUM,
-				Instrumentos.LOW_TOM,
+				Instrumentos.LOW_FLOOR_TOM,
+				Instrumentos.ACOUSTIC_SNARE,
 				Instrumentos.RIDE_CYMBAL,
 				Instrumentos.SPLASH_CYMBAL,
 				Instrumentos.CHINESE_CYMBAL,
-				Instrumentos.HIGH_FLOOR_TOM,
 				Instrumentos.HI_MID_TOM,
-				Instrumentos.HIGH_TOM
+				Instrumentos.HIGH_TOM,
+				Instrumentos.OPEN_HI_HAT
 		};
+		
+		GerenciadorAudio.iniciar();
+		
 		painelEntrada.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {

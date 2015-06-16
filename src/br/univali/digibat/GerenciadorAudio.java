@@ -9,7 +9,9 @@ public class GerenciadorAudio {
 	private static Synthesizer synth;
 	private static MidiChannel canal;
 	
-	static {
+	public static void iniciar() {
+		if (synth != null) return;
+		
 		try {
 			synth = MidiSystem.getSynthesizer();
 			canal = synth.getChannels()[9];
