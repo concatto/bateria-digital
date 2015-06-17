@@ -1,8 +1,14 @@
 package br.univali.digibat;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.sound.midi.Instrument;
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 
 public class GerenciadorAudio {
@@ -14,8 +20,24 @@ public class GerenciadorAudio {
 		
 		try {
 			synth = MidiSystem.getSynthesizer();
-			canal = synth.getChannels()[9];
+			File file = new File("C:/Users/Fernando/bateria-digital/FluidR3.sf2");
+			Soundbank bank;
+			try {
+				bank = MidiSystem.getSoundbank(file);
+			} catch (IOException | InvalidMidiDataException e) {
+				e.printStackTrace();
+				return;
+			}
 			synth.open();
+			canal = synth.getChannels()[9];
+			if (synth.isSoundbankSupported(bank)) {
+				Instrument instrument = bank.getInstruments()[10];
+				synth.loadInstrument(instrument);
+				canal.programChange(instrument.getPatch().getProgram());
+			}
+			
+			
+			
 		} catch (MidiUnavailableException e) {
 			e.printStackTrace();
 		}
