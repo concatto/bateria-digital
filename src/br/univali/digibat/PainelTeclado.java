@@ -9,7 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class PainelTeclado extends PainelSensores {
+public class PainelTeclado extends PainelBase {
 	private JPanel painelEntrada = new JPanel();
 
 	public PainelTeclado(Controlador controlador) {
@@ -19,17 +19,17 @@ public class PainelTeclado extends PainelSensores {
 		painelEntrada.setLayout(new BorderLayout());
 		painelEntrada.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		painelEntrada.setFocusable(true);
-		final int[] instrumentos = {
-				Instrumentos.CRASH_CYMBAL,
-				Instrumentos.BASS_DRUM,
-				Instrumentos.LOW_FLOOR_TOM,
-				Instrumentos.ACOUSTIC_SNARE,
-				Instrumentos.RIDE_CYMBAL,
-				Instrumentos.SPLASH_CYMBAL,
-				Instrumentos.CHINESE_CYMBAL,
-				Instrumentos.HI_MID_TOM,
-				Instrumentos.HIGH_TOM,
-				Instrumentos.OPEN_HI_HAT
+		final Instrumento[] instrumentos = {
+				Instrumento.SIDE_STICK,
+				Instrumento.BASS_DRUM,
+				Instrumento.LOW_FLOOR_TOM,
+				Instrumento.ACOUSTIC_SNARE,
+				Instrumento.RIDE_CYMBAL,
+				Instrumento.CRASH_CYMBAL,
+				Instrumento.CHINESE_CYMBAL,
+				Instrumento.HI_MID_TOM,
+				Instrumento.HIGH_TOM,
+				Instrumento.OPEN_HI_HAT
 		};
 		
 		GerenciadorAudio.iniciar();
@@ -39,7 +39,7 @@ public class PainelTeclado extends PainelSensores {
 			public void keyPressed(KeyEvent e) {
 				int nota = Character.getNumericValue(e.getKeyChar());
 				if (nota >= 0 && nota < instrumentos.length) {
-					GerenciadorAudio.tocar(instrumentos[nota]);
+					GerenciadorAudio.tocar(instrumentos[nota].getNota());
 				}
 			}
 		});

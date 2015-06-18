@@ -2,6 +2,7 @@ package br.univali.digibat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.sound.midi.Instrument;
 import javax.sound.midi.InvalidMidiDataException;
@@ -20,7 +21,7 @@ public class GerenciadorAudio {
 		
 		try {
 			synth = MidiSystem.getSynthesizer();
-			File file = new File("C:/Users/Fernando/bateria-digital/FluidR3.sf2");
+			File file = new File(GerenciadorAudio.class.getClassLoader().getResource("res/FluidR3.SF2").toURI());
 			Soundbank bank;
 			try {
 				bank = MidiSystem.getSoundbank(file);
@@ -35,10 +36,9 @@ public class GerenciadorAudio {
 				synth.loadInstrument(instrument);
 				canal.programChange(instrument.getPatch().getProgram());
 			}
-			
-			
-			
 		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}

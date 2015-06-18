@@ -1,6 +1,8 @@
 package br.univali.digibat;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -15,7 +17,7 @@ public class GerenciadorPortas {
 	private int parity = SerialPort.PARITY_NONE;
 	private int tamanhoMensagem;
 	
-	private ByteArrayConsumer consumidor;
+	private List<ByteArrayConsumer> consumidores = new ArrayList<>();
 	private SerialPort porta;
 	
 	public GerenciadorPortas(int tamanhoMensagem) {
@@ -53,25 +55,9 @@ public class GerenciadorPortas {
 						byte[] end = new byte[buffer.capacity()];
 						buffer.position(0);
 						buffer.get(end);
-						if (consumidor != null) consumidor.accept(end);
-						
-//						int high = end[end.length - 1] & 0xFF;
-//						int low = end[end.length - 2] & 0xFF;
-//
-//						int sinal = low | (high << 8);
-//						int pin = end[0];
-//						
-//						System.out.printf("Pin %d: %d. ", pin, sinal);
-//						if (pin == 1) System.out.println();
-//						
-//						if (sinal > 300) {
-//							if (permissoes[pin]) {
-//								canal.noteOn(instrumentos[pin], 127);
-//								permissoes[pin] = false;
-//							}
-//						} else {
-//							permissoes[pin] = true;
-//						}
+						for (ByteArrayConsumer consumidor : consumidores) {
+							if (consumidor != null) consumidor.accept(end);
+						}
 						buffer.clear();
 					}
 				} catch (SerialPortException e) {
@@ -88,8 +74,8 @@ public class GerenciadorPortas {
 	public int getTamanhoMensagem() {
 		return tamanhoMensagem;
 	}
-	
-	public void setConsumidor(ByteArrayConsumer consumidor) {
-		this.consumidor = consumidor;
+
+	public void addConsumidor(ByteArrayConsumer consumidor) {
+		consumidores.add(consumidor);
 	}
 }

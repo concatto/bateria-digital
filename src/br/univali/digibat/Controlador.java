@@ -1,8 +1,12 @@
 package br.univali.digibat;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jssc.SerialPortException;
 
 public class Controlador {
+	private Map<Integer, Integer> instrumentos = new HashMap<>();
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
 	private ConsumidorBateria consumidor;
@@ -24,7 +28,7 @@ public class Controlador {
 			if (sucesso) {
 				alterarInterface(ModoInterface.SENSORES);
 				consumidor = new ConsumidorBateria();
-				gerenciador.setConsumidor(consumidor);
+				gerenciador.addConsumidor(consumidor);
 			} else {
 				userInterface.mensagem("Falha ao abrir a porta.");
 			}
@@ -34,11 +38,15 @@ public class Controlador {
 		}
 	}
 	
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		new Controlador();
 	}
 
 	public void alterarInterface(ModoInterface modo) {
 		userInterface.alterarModo(modo);
+	}
+	
+	public void definirInstrumento(int indice, int instrumento) {
+		instrumentos.put(indice, instrumento);
 	}
 }
