@@ -1,5 +1,6 @@
 package br.univali.digibat;
 
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class GerenciadorPortas {
 	private int parity = SerialPort.PARITY_NONE;
 	private int tamanhoMensagem;
 	
-	private List<ByteArrayConsumer> consumidores = new ArrayList<>();
+	private List<Consumidor<Byte[]>> consumidores = new ArrayList<>();
 	private SerialPort porta;
 	
 	public GerenciadorPortas(int tamanhoMensagem) {
@@ -52,11 +53,11 @@ public class GerenciadorPortas {
 
 					buffer.put(bytes);
 					if (buffer.remaining() == 0) {
-						byte[] end = new byte[buffer.capacity()];
+						Byte[] bytesCompletos = new Byte[buffer.capacity()];
 						buffer.position(0);
-						buffer.get(end);
-						for (ByteArrayConsumer consumidor : consumidores) {
-							if (consumidor != null) consumidor.accept(end);
+						transferirBytes(buffer, bytesCompletos);
+						for (Consumidor<Byte[]> consumidor : consumidores) {
+							if (consumidor != null) consumidor.consumir(bytesCompletos);
 						}
 						buffer.clear();
 					}
@@ -67,6 +68,13 @@ public class GerenciadorPortas {
 		});
 	}
 	
+	private static void transferirBytes(ByteBuffer origem, Byte[] destino) {
+		if (origem.remaining() > destino.length) throw new BufferOverflowException();
+		for (int i = 0; i < destino.length; i++) {
+			destino[i] = origem.get();
+		}
+	}
+	
 	public void setTamanhoMensagem(int tamanhoMensagem) {
 		this.tamanhoMensagem = tamanhoMensagem;
 	}
@@ -75,7 +83,7 @@ public class GerenciadorPortas {
 		return tamanhoMensagem;
 	}
 
-	public void addConsumidor(ByteArrayConsumer consumidor) {
+	public void addConsumidor(Consumidor<Byte[]> consumidor) {
 		consumidores.add(consumidor);
 	}
 }

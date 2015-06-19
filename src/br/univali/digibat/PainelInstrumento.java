@@ -1,5 +1,8 @@
 package br.univali.digibat;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -11,7 +14,7 @@ public class PainelInstrumento extends JPanel {
 	
 	private JLabel labelPin = new JLabel();
 	private JPanel instrumentoContainer = new JPanel();
-	private JComboBox<String> instrumento = new JComboBox<String>();
+	private JComboBox<Instrumento> instrumento = new JComboBox<>();
 	
 	public PainelInstrumento(int pin) {
 		this.pin = pin;
@@ -19,6 +22,10 @@ public class PainelInstrumento extends JPanel {
 		labelPin.setText(String.valueOf(pin));
 		labelPin.setAlignmentX(CENTER_ALIGNMENT);
 		instrumentoContainer.add(instrumento);
+		
+		for (Instrumento instr : Instrumento.values()) {
+			instrumento.addItem(instr);
+		}
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(labelPin);
@@ -29,7 +36,14 @@ public class PainelInstrumento extends JPanel {
 		return pin;
 	}
 	
-	public void onEscolherInstrumento() {
-		
+	public void onEscolherInstrumento(final Consumidor<Instrumento> acao) {
+		instrumento.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {	
+					acao.consumir((Instrumento) e.getItem());
+				}
+			}
+		});
 	}
 }

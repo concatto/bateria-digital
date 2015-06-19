@@ -1,12 +1,8 @@
 package br.univali.digibat;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jssc.SerialPortException;
 
 public class Controlador {
-	private Map<Integer, Integer> instrumentos = new HashMap<>();
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
 	private ConsumidorBateria consumidor;
@@ -46,7 +42,7 @@ public class Controlador {
 		userInterface.alterarModo(modo);
 	}
 	
-	public void definirInstrumento(int indice, int instrumento) {
-		instrumentos.put(indice, instrumento);
+	public void definirInstrumento(int pin, Instrumento instrumento) {
+		consumidor.definirInstrumento(pin, instrumento.getNota());
 	}
 }
