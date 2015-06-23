@@ -25,7 +25,6 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 		
 		if (sinal > 300) {
 			Integer instrumento = instrumentos.get((int) bytes[0]);
-			System.out.println(instrumentos);
 			if (instrumento != null) GerenciadorAudio.tocar(instrumento);
 		}
 	}

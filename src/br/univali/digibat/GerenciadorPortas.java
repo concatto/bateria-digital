@@ -3,7 +3,12 @@ package br.univali.digibat;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -12,12 +17,19 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class GerenciadorPortas {
+	private static final byte[] HEARTBEAT = {85, 78, 73};
+	private static final Byte[] HEARTBEAT_BOXED = box(HEARTBEAT);
+	
 	private int baudRate = SerialPort.BAUDRATE_9600;
 	private int dataBits = SerialPort.DATABITS_8;
 	private int stopBits = SerialPort.STOPBITS_1;
 	private int parity = SerialPort.PARITY_NONE;
 	private int tamanhoMensagem;
+	private boolean vivo = false;
+	private int falhasHeartbeat = 0;
 	
+	private ScheduledExecutorService heartbeatThread = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledFuture<?> heartbeatTask;
 	private List<Consumidor<Byte[]>> consumidores = new ArrayList<>();
 	private SerialPort porta;
 	
@@ -33,7 +45,7 @@ public class GerenciadorPortas {
 		porta = new SerialPort(nomePorta);
 		if (porta.openPort()) {
 			if (porta.setParams(baudRate, dataBits, stopBits, parity)) {
-				//TODO Heartbeat para o Arduino. Desenvolver um if.
+				iniciarHeartbeat();
 				aplicarListener();
 				return true;
 			}
@@ -42,7 +54,29 @@ public class GerenciadorPortas {
 		return false;
 	}
 	
-	private void aplicarListener() throws SerialPortException {
+	private void iniciarHeartbeat() {
+		heartbeatTask = heartbeatThread.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				if (vivo) {
+					falhasHeartbeat++;
+					if (falhasHeartbeat > 3) {
+						vivo = false;
+					}
+				}
+				try {
+					if (!porta.writeBytes(HEARTBEAT)) {
+						vivo = false;
+					}
+				} catch (SerialPortException e) {
+					e.printStackTrace();
+					vivo = false;
+				}
+			}
+		}, 0, 1000, TimeUnit.MILLISECONDS);
+	}
+
+	private void aplicarListener() throws SerialPortException, IllegalStateException {
 		final ByteBuffer buffer = ByteBuffer.allocate(tamanhoMensagem);
 		
 		porta.addEventListener(new SerialPortEventListener() {
@@ -51,13 +85,25 @@ public class GerenciadorPortas {
 				try {
 					byte[] bytes = porta.readBytes(serialPortEvent.getEventValue());
 
-					buffer.put(bytes);
+					try {
+						buffer.put(bytes);
+					} catch (BufferOverflowException e) {
+						e.printStackTrace();
+						vivo = false;
+						throw new IllegalStateException("Recebida mensagem com número errado de bytes.");
+					}
+					
 					if (buffer.remaining() == 0) {
 						Byte[] bytesCompletos = new Byte[buffer.capacity()];
 						buffer.position(0);
 						transferirBytes(buffer, bytesCompletos);
-						for (Consumidor<Byte[]> consumidor : consumidores) {
-							if (consumidor != null) consumidor.consumir(bytesCompletos);
+						if (Arrays.equals(bytesCompletos, HEARTBEAT_BOXED)) {
+							falhasHeartbeat = 0;
+							vivo = true;
+						} else {
+							for (Consumidor<Byte[]> consumidor : consumidores) {
+								if (consumidor != null) consumidor.consumir(bytesCompletos);
+							}
 						}
 						buffer.clear();
 					}
@@ -73,6 +119,26 @@ public class GerenciadorPortas {
 		for (int i = 0; i < destino.length; i++) {
 			destino[i] = origem.get();
 		}
+	}
+	
+	private static Byte[] box(byte[] origem) {
+		Byte[] destino = new Byte[origem.length];
+		for (int i = 0; i < origem.length; i++) {
+			destino[i] = origem[i];
+		}
+		return destino;
+	}
+	
+	public boolean fecharPorta() throws SerialPortException {
+		/* Curto circuito importante */
+		if (porta == null || !porta.isOpened()) throw new IllegalStateException("A porta não está aberta.");
+		
+		heartbeatTask.cancel(true);
+		return porta.closePort();
+	}
+	
+	public boolean isVivo() {
+		return vivo;
 	}
 	
 	public void setTamanhoMensagem(int tamanhoMensagem) {

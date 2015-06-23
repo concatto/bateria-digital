@@ -7,5 +7,11 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Digibat/lib/javadoc/jssc-2.8.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/jfreechart/lib/jcommon-1.0.23.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart/lib/jfreechart-1.0.19.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/Fernando/bateria-digital/lib/jfreechart/jfreechart-1.0.19-fx-javadocs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

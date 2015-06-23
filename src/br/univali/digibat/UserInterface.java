@@ -1,39 +1,59 @@
 package br.univali.digibat;
 
-import javax.swing.JFrame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings("serial")
-public class UserInterface extends JFrame {
-	private JMenu arquivo = new JMenu("Arquivo");
-	private JMenuItem sair = new JMenuItem("Sair");
-	private JMenu janela = new JMenu("Janela");
-	private JMenuItem graficoSinal = new JMenuItem("Gráfico do Sinal");
-	private JMenuBar menuBar = new JMenuBar();	
+public class UserInterface extends FrameBase {
+	private JMenu arquivo;
+	private JMenuItem sair;
+	private JMenu janela;
+	private JMenuItem exibirGrafico;
+	private JMenuBar menuBar;
 	
+	private GraficoSinal graficoSinal;
 	private PainelSelecao painelSelecao;
 	private PainelSensores painelSensores;
 	private PainelTeclado painelTeclado;
-	private Controlador controlador;
 	
 	public UserInterface(Controlador controlador) {
-		super("Digibat");
-		this.controlador = controlador;	
+		super(controlador, "Digibat");
+	}
+	
+	@Override
+	protected void inicializarComponentes() {
+		arquivo = new JMenu("Arquivo");
+		sair = new JMenuItem("Sair");
+		janela = new JMenu("Janela");
+		exibirGrafico = new JMenuItem("Gráfico do Sinal");
+		menuBar = new JMenuBar();
+		
 		alterarModo(ModoInterface.SELECAO);
 		
 		arquivo.add(sair);
-		janela.add(graficoSinal);
+		janela.add(exibirGrafico);
 		menuBar.add(arquivo);
 		menuBar.add(janela);
 		
+		aplicarListeners();
+		
 		setJMenuBar(menuBar);
 		setContentPane(painelSelecao);
-		pack();
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
+	}
+	
+	private void aplicarListeners() {
+		exibirGrafico.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (graficoSinal == null) graficoSinal = new GraficoSinal(controlador);
+				graficoSinal.setVisible(true);
+			}
+		});
 	}
 	
 	public void alterarModo(ModoInterface modo) {
