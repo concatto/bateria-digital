@@ -84,7 +84,6 @@ public class GerenciadorPortas {
 			public void serialEvent(SerialPortEvent serialPortEvent) {
 				try {
 					byte[] bytes = porta.readBytes(serialPortEvent.getEventValue());
-
 					try {
 						buffer.put(bytes);
 					} catch (BufferOverflowException e) {

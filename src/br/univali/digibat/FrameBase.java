@@ -13,7 +13,7 @@ public abstract class FrameBase extends JFrame {
 		inicializarComponentes();
 		
 		pack();
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 	}
 	

@@ -15,6 +15,7 @@ public class GraficoSinal extends FrameBase {
 	private JFreeChart chart;
 	private ChartPanel chartPanel;
 	private JPanel root;
+	private long tempo;
 
 	public GraficoSinal(Controlador controlador) {
 		super(controlador, "Gráfico");
@@ -30,11 +31,25 @@ public class GraficoSinal extends FrameBase {
 		
 		dataset.addSeries(series);
 		root.add(chartPanel);
+		chart.getXYPlot().getRangeAxis().setUpperBound(1100);
 		
 		setContentPane(root);
 	}
 	
+	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		series.clear();
+		tempo = System.currentTimeMillis();
+	}
+	
 	public void adicionarSinal(int sinal, int pin) {
-		
+		if (pin == 0) {
+			System.out.println(pin + ": " + sinal + "  ");
+			long y = System.currentTimeMillis() - tempo;
+			series.add(y, sinal);
+			chart.getXYPlot().getDomainAxis().setLowerBound(y - 10000);
+			chart.getXYPlot().getDomainAxis().setUpperBound(y);
+		}
 	}
 }

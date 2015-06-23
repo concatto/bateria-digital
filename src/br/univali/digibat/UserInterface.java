@@ -23,6 +23,8 @@ public class UserInterface extends FrameBase {
 	
 	public UserInterface(Controlador controlador) {
 		super(controlador, "Digibat");
+		
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
 	@Override
@@ -94,5 +96,9 @@ public class UserInterface extends FrameBase {
 
 	public void definirPortas(String[] nomesPortas) {
 		painelSelecao.definirPortas(nomesPortas);
+	}
+
+	public void adicionarSinal(Byte byte1, int unirBytes) {
+		if (graficoSinal != null) graficoSinal.adicionarSinal(unirBytes, byte1);
 	}
 }

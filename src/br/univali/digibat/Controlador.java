@@ -25,6 +25,12 @@ public class Controlador {
 				alterarInterface(ModoInterface.SENSORES);
 				consumidor = new ConsumidorBateria();
 				gerenciador.addConsumidor(consumidor);
+				gerenciador.addConsumidor(new Consumidor<Byte[]>() {
+					@Override
+					public void consumir(Byte[] t) {
+						userInterface.adicionarSinal(t[0], ConsumidorBateria.unirBytes(t[1], t[2]));
+					}
+				});
 			} else {
 				userInterface.mensagem("Falha ao abrir a porta.");
 			}
