@@ -17,8 +17,10 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class GerenciadorPortas {
+	private static final int FALHAS_HEARTBEAT = 3;
 	private static final byte[] HEARTBEAT = {85, 78, 73};
 	private static final Byte[] HEARTBEAT_BOXED = box(HEARTBEAT);
+	private static final int TAMANHO_BUFFER = 64;
 	
 	private int baudRate = SerialPort.BAUDRATE_9600;
 	private int dataBits = SerialPort.DATABITS_8;
@@ -60,7 +62,7 @@ public class GerenciadorPortas {
 			public void run() {
 				if (vivo) {
 					falhasHeartbeat++;
-					if (falhasHeartbeat > 3) {
+					if (falhasHeartbeat > FALHAS_HEARTBEAT) {
 						vivo = false;
 					}
 				}
@@ -77,7 +79,7 @@ public class GerenciadorPortas {
 	}
 
 	private void aplicarListener() throws SerialPortException, IllegalStateException {
-		final ByteBuffer buffer = ByteBuffer.allocate(tamanhoMensagem);
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(TAMANHO_BUFFER);
 		
 		porta.addEventListener(new SerialPortEventListener() {
 			@Override
@@ -89,22 +91,23 @@ public class GerenciadorPortas {
 					} catch (BufferOverflowException e) {
 						e.printStackTrace();
 						vivo = false;
-						throw new IllegalStateException("Recebida mensagem com número errado de bytes.");
 					}
 					
-					if (buffer.remaining() == 0) {
-						Byte[] bytesCompletos = new Byte[buffer.capacity()];
-						buffer.position(0);
+					if (buffer.position() > tamanhoMensagem) {
+						Byte[] bytesCompletos = new Byte[tamanhoMensagem];
+						buffer.flip();
 						transferirBytes(buffer, bytesCompletos);
+						buffer.compact();
+						
 						if (Arrays.equals(bytesCompletos, HEARTBEAT_BOXED)) {
 							falhasHeartbeat = 0;
 							vivo = true;
+							System.out.println("It's alive!");
 						} else {
 							for (Consumidor<Byte[]> consumidor : consumidores) {
 								if (consumidor != null) consumidor.consumir(bytesCompletos);
 							}
 						}
-						buffer.clear();
 					}
 				} catch (SerialPortException e) {
 					e.printStackTrace();
