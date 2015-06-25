@@ -93,7 +93,7 @@ public class GerenciadorPortas {
 						vivo = false;
 					}
 					
-					if (buffer.position() > tamanhoMensagem) {
+					while (buffer.position() > tamanhoMensagem) {
 						Byte[] bytesCompletos = new Byte[tamanhoMensagem];
 						buffer.flip();
 						transferirBytes(buffer, bytesCompletos);

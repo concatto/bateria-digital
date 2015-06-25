@@ -1,0 +1,44 @@
+Arduino routine
+
+
+if not alive then wait for handshake
+
+on handshake do
+  set alive
+  handshake back
+end on
+
+if alive do
+  if 1 second elapsed do
+    send keepalive
+    if data available do
+      read data
+      if keepalive then set alive
+      else failures++
+    else failures++
+    if failures > maximum failures then set not alive
+  end if
+  /* do work */
+end if
+
+----
+
+Java routine
+
+
+on connecting do
+  send handshake
+  wait 1 second for response
+  if responded then start receiving data
+  else throw exception
+end on
+
+every second do
+  send keepalive
+  failures++
+end
+
+on receiving data do
+  if data is keepalive then reset faiures
+  else do work
+end on
