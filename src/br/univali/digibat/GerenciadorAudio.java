@@ -43,8 +43,8 @@ public class GerenciadorAudio {
 		}
 	}
 	
-	public static void tocar(int nota) {
-		canal.noteOn(nota, 127);
+	public static void tocar(int nota, int forca) {
+		canal.noteOn(nota, forca);
 	}
 	
 	public void soltar(int nota) {

@@ -45,7 +45,6 @@ public class GraficoSinal extends FrameBase {
 	
 	public void adicionarSinal(int sinal, int pin) {
 		if (pin == 0) {
-			System.out.println(pin + ": " + sinal + "  ");
 			long y = System.currentTimeMillis() - tempo;
 			series.add(y, sinal);
 			chart.getXYPlot().getDomainAxis().setLowerBound(y - 10000);

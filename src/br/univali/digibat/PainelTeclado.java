@@ -39,7 +39,7 @@ public class PainelTeclado extends PainelBase {
 			public void keyPressed(KeyEvent e) {
 				int nota = Character.getNumericValue(e.getKeyChar());
 				if (nota >= 0 && nota < instrumentos.length) {
-					GerenciadorAudio.tocar(instrumentos[nota].getNota());
+					GerenciadorAudio.tocar(instrumentos[nota].getNota(), 127);
 				}
 			}
 		});

@@ -20,7 +20,7 @@ public class GerenciadorPortas {
 	private static final int FALHAS_HEARTBEAT = 3;
 	private static final byte[] HEARTBEAT = {85, 78, 73};
 	private static final Byte[] HEARTBEAT_BOXED = box(HEARTBEAT);
-	private static final int TAMANHO_BUFFER = 64;
+	private static final int TAMANHO_BUFFER = 128;
 	
 	private int baudRate = SerialPort.BAUDRATE_9600;
 	private int dataBits = SerialPort.DATABITS_8;
@@ -79,7 +79,7 @@ public class GerenciadorPortas {
 	}
 
 	private void aplicarListener() throws SerialPortException, IllegalStateException {
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(TAMANHO_BUFFER);
+		final ByteBuffer buffer = ByteBuffer.allocate(TAMANHO_BUFFER);
 		
 		porta.addEventListener(new SerialPortEventListener() {
 			@Override
@@ -117,7 +117,7 @@ public class GerenciadorPortas {
 	}
 	
 	private static void transferirBytes(ByteBuffer origem, Byte[] destino) {
-		if (origem.remaining() > destino.length) throw new BufferOverflowException();
+//		if (origem.remaining() > destino.length) throw new BufferOverflowException();
 		for (int i = 0; i < destino.length; i++) {
 			destino[i] = origem.get();
 		}

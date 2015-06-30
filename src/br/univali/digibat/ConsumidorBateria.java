@@ -23,11 +23,19 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 		int sinal = unirBytes(bytes[1], bytes[2]);
 		
 		Sensor sensor = instrumentos.get((int) bytes[0]);
-		System.out.printf("%d:%d ", bytes[0], sinal);
-		if (bytes[0] == 1) System.out.println();
+		
 		if (sensor != null) {
-			if (sinal > 400) {
-				if (sensor.hasPermissao()) GerenciadorAudio.tocar(sensor.getInstrumento());
+			int forca = (sinal * 87 / 600) + 40;
+			if (forca > 127) forca = 127;
+			
+			if (sensor.isPronto()) {
+				GerenciadorAudio.tocar(sensor.getInstrumento(), Math.max(forca, sensor.getForca()));
+				sensor.resetar();
+			} else if (sinal > 30) {
+				if (sensor.hasPermissao()) {
+					sensor.preparar(forca);
+					GerenciadorAudio.tocar(sensor.getInstrumento(), forca);
+				}
 				sensor.setPermissao(false);
 			} else {
 				sensor.setPermissao(true);
