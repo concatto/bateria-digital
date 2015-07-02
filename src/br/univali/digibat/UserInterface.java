@@ -17,7 +17,7 @@ public class UserInterface extends FrameBase {
 	private JMenuBar menuBar;
 	
 	private GraficoSinal graficoSinal;
-	private PainelSelecao painelSelecao;
+	private PainelInicio painelSelecao;
 	private PainelSensores painelSensores;
 	private PainelTeclado painelTeclado;
 	
@@ -63,7 +63,7 @@ public class UserInterface extends FrameBase {
 		
 		switch (modo) {
 		case SELECAO:
-			if (painelSelecao == null) painelSelecao = new PainelSelecao(controlador);
+			if (painelSelecao == null) painelSelecao = new PainelInicio(controlador);
 			painel = painelSelecao;
 			break;
 		case TECLADO:
@@ -79,6 +79,8 @@ public class UserInterface extends FrameBase {
 		}
 		
 		setContentPane(painel);
+		pack();
+		setLocationRelativeTo(null);
 		revalidate();
 	}
 
@@ -88,14 +90,6 @@ public class UserInterface extends FrameBase {
 	
 	public void erro(Exception e) {
 		JOptionPane.showMessageDialog(this, e);
-	}
-	
-	public String getPortaSelecionada() {
-		return painelSelecao.getPortaSelecionada();
-	}
-
-	public void definirPortas(String[] nomesPortas) {
-		painelSelecao.definirPortas(nomesPortas);
 	}
 
 	public void adicionarSinal(Byte byte1, int unirBytes) {

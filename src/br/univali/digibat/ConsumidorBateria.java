@@ -34,7 +34,6 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 			} else if (sinal > 30) {
 				if (sensor.hasPermissao()) {
 					sensor.preparar(forca);
-					GerenciadorAudio.tocar(sensor.getInstrumento(), forca);
 				}
 				sensor.setPermissao(false);
 			} else {

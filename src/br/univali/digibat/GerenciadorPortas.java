@@ -22,6 +22,7 @@ import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 
 public class GerenciadorPortas {
+	private static final int TIMEOUT = 2500;
 	private static final byte[] HANDSHAKE = {85, 66, 68};
 	private static final byte[] HANDSHAKE_OK = {72, 79, 75};
 	private static final byte[] HEARTBEAT = {85, 78, 73};
@@ -46,8 +47,8 @@ public class GerenciadorPortas {
 		this.tamanhoMensagem = tamanhoMensagem;
 	}
 	
-	public SerialPort abrirExperimental() {
-		String[] portas = SerialPortList.getPortNames();
+	public boolean abrirExperimental() {
+ 		String[] portas = SerialPortList.getPortNames();
 		ExecutorService executor = Executors.newFixedThreadPool(portas.length);
 		ExecutorCompletionService<SerialPort> completion = new ExecutorCompletionService<>(executor);
 		
@@ -63,13 +64,21 @@ public class GerenciadorPortas {
 		for (int i = 0; i < portas.length; i++) {
 			try {
 				SerialPort porta = completion.take().get();
-				if (porta != null) return porta;
+				if (porta != null) {
+					executor.shutdownNow();
+					this.porta = porta;
+					iniciarHeartbeat();
+					aplicarListener();
+					return true;
+				}
 			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		return null;
+		return false;
 	}
 	
 	private SerialPort tentarAbrir(String porta) {
@@ -77,14 +86,19 @@ public class GerenciadorPortas {
 		try {
 			serial.openPort();
 			serial.setParams(baudRate, dataBits, stopBits, parity);
-			if (!serial.writeBytes(HANDSHAKE)) return null;
-			byte[] bytes = serial.readBytes(HANDSHAKE_OK.length, 1000);
-			if (Arrays.equals(bytes, HANDSHAKE_OK)) return serial;
-			else return null;
-		} catch (SerialPortException | SerialPortTimeoutException e) {
+			byte[] bytes = serial.readBytes(HANDSHAKE.length, TIMEOUT);
+			if (Arrays.equals(bytes, HANDSHAKE)) {
+				if (serial.writeBytes(HANDSHAKE_OK)) {
+					return serial;
+				}
+			}
+		} catch (SerialPortException e) {
 			e.printStackTrace();
-			return null;
+		} catch (SerialPortTimeoutException e) {
+			System.out.println("Porta " + porta + " não respondeu.");
 		}
+		
+		return null;
 	}
 	
 	public String[] obterPortas() {
@@ -126,7 +140,7 @@ public class GerenciadorPortas {
 		}, 0, 1000, TimeUnit.MILLISECONDS);
 	}
 
-	private void aplicarListener() throws SerialPortException, IllegalStateException {
+	private void aplicarListener() throws SerialPortException {
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(TAMANHO_BUFFER);
 		
 		porta.addEventListener(new SerialPortEventListener() {
