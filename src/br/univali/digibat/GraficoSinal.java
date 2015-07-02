@@ -26,7 +26,7 @@ public class GraficoSinal extends FrameBase {
 		root = new JPanel();
 		series = new XYSeries("test");
 		dataset = new XYSeriesCollection();
-		chart = ChartFactory.createXYLineChart("Sinal", "Tempo (ms)", "Voltagem (V)", dataset);
+		chart = ChartFactory.createXYLineChart("Sinal", "Tempo", "Voltagem (V)", dataset);
 		chartPanel = new ChartPanel(chart);
 		
 		dataset.addSeries(series);
@@ -39,7 +39,9 @@ public class GraficoSinal extends FrameBase {
 	@Override
 	public void setVisible(boolean b) {
 		super.setVisible(b);
-		series.clear();
+		for (int i = 0; i < dataset.getSeriesCount(); i++) {
+			dataset.getSeries(i).clear();
+		}
 		tempo = System.currentTimeMillis();
 	}
 	

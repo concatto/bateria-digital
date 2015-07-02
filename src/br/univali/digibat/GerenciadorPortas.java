@@ -5,6 +5,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -15,11 +19,14 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import jssc.SerialPortTimeoutException;
 
 public class GerenciadorPortas {
-	private static final int FALHAS_HEARTBEAT = 3;
+	private static final byte[] HANDSHAKE = {85, 66, 68};
+	private static final byte[] HANDSHAKE_OK = {72, 79, 75};
 	private static final byte[] HEARTBEAT = {85, 78, 73};
 	private static final Byte[] HEARTBEAT_BOXED = box(HEARTBEAT);
+	private static final int FALHAS_HEARTBEAT = 3;
 	private static final int TAMANHO_BUFFER = 128;
 	
 	private int baudRate = SerialPort.BAUDRATE_9600;
@@ -37,6 +44,47 @@ public class GerenciadorPortas {
 	
 	public GerenciadorPortas(int tamanhoMensagem) {
 		this.tamanhoMensagem = tamanhoMensagem;
+	}
+	
+	public SerialPort abrirExperimental() {
+		String[] portas = SerialPortList.getPortNames();
+		ExecutorService executor = Executors.newFixedThreadPool(portas.length);
+		ExecutorCompletionService<SerialPort> completion = new ExecutorCompletionService<>(executor);
+		
+		for (final String porta : SerialPortList.getPortNames()) {
+			completion.submit(new Callable<SerialPort>() {
+				@Override
+				public SerialPort call() throws Exception {
+					return tentarAbrir(porta);
+				}
+			});
+		}
+		
+		for (int i = 0; i < portas.length; i++) {
+			try {
+				SerialPort porta = completion.take().get();
+				if (porta != null) return porta;
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+	
+	private SerialPort tentarAbrir(String porta) {
+		SerialPort serial = new SerialPort(porta);
+		try {
+			serial.openPort();
+			serial.setParams(baudRate, dataBits, stopBits, parity);
+			if (!serial.writeBytes(HANDSHAKE)) return null;
+			byte[] bytes = serial.readBytes(HANDSHAKE_OK.length, 1000);
+			if (Arrays.equals(bytes, HANDSHAKE_OK)) return serial;
+			else return null;
+		} catch (SerialPortException | SerialPortTimeoutException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public String[] obterPortas() {
@@ -79,7 +127,7 @@ public class GerenciadorPortas {
 	}
 
 	private void aplicarListener() throws SerialPortException, IllegalStateException {
-		final ByteBuffer buffer = ByteBuffer.allocate(TAMANHO_BUFFER);
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(TAMANHO_BUFFER);
 		
 		porta.addEventListener(new SerialPortEventListener() {
 			@Override
@@ -117,7 +165,6 @@ public class GerenciadorPortas {
 	}
 	
 	private static void transferirBytes(ByteBuffer origem, Byte[] destino) {
-//		if (origem.remaining() > destino.length) throw new BufferOverflowException();
 		for (int i = 0; i < destino.length; i++) {
 			destino[i] = origem.get();
 		}
