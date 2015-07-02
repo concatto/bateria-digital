@@ -1,0 +1,28 @@
+atualizarForca(int forca) {
+	if (forca - this.forca > 10) {
+		preparando = true;
+	} else if (preparando && forca - this.forca < 10) {
+		forcaMaxima = forca;
+		preparando = false;
+		pronto = true;
+	}
+	
+	this.forca = forca;
+}
+
+//MUST TEST IF (PRONTO) BEFORE CALLING THIS METHOD
+
+
+if (sensor.pronto) {
+	playNote(sensor.nota, sensor.forcaMaxima);
+	sensor.resetar();
+}
+
+atualizarForca(sinal);
+
+
+//Must call resetar() afterwards
+
+resetar() {
+	pronto = false;
+}
