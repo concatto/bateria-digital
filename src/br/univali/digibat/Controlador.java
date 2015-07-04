@@ -1,7 +1,6 @@
 package br.univali.digibat;
 
-
-public class Controlador {
+public class Controlador {	
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
 	private ConsumidorBateria consumidor;

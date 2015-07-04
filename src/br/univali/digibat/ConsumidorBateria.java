@@ -15,9 +15,14 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 	}
 	
 	public void definirInstrumento(int indice, int instrumento) {
-		instrumentos.put(indice, new Sensor(instrumento, true));
+		Sensor sensor = instrumentos.get(indice);
+		if (sensor == null) {
+			instrumentos.put(indice, new Sensor(instrumento));
+		} else {
+			sensor.setInstrumento(instrumento);
+		}
 	}
-
+	
 	@Override
 	public void consumir(Byte[] bytes) {
 		int sinal = unirBytes(bytes[1], bytes[2]);
@@ -28,16 +33,12 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 			int forca = (sinal * 87 / 600) + 40;
 			if (forca > 127) forca = 127;
 			
+			sensor.atualizarForca(sinal);
+			
 			if (sensor.isPronto()) {
-				GerenciadorAudio.tocar(sensor.getInstrumento(), Math.max(forca, sensor.getForca()));
+				System.out.printf("Inst: %d. Forca: %d\n", sensor.getInstrumento(), sensor.getForcaMaxima());
+//				GerenciadorAudio.tocar(sensor.getInstrumento(), sensor.getForcaMaxima());
 				sensor.resetar();
-			} else if (sinal > 30) {
-				if (sensor.hasPermissao()) {
-					sensor.preparar(forca);
-				}
-				sensor.setPermissao(false);
-			} else {
-				sensor.setPermissao(true);
 			}
 		}
 	}

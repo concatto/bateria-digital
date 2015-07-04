@@ -22,12 +22,11 @@ import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 
 public class GerenciadorPortas {
-	private static final int TIMEOUT = 2500;
+	private static final int TIMEOUT_HANDSHAKE = 2500;
 	private static final byte[] HANDSHAKE = {85, 66, 68};
 	private static final byte[] HANDSHAKE_OK = {72, 79, 75};
 	private static final byte[] HEARTBEAT = {85, 78, 73};
-	private static final Byte[] HEARTBEAT_BOXED = box(HEARTBEAT);
-	private static final int FALHAS_HEARTBEAT = 3;
+	private static final int LIMITE_FALHAS_HEARTBEAT = 3;
 	private static final int TAMANHO_BUFFER = 128;
 	
 	private int baudRate = SerialPort.BAUDRATE_9600;
@@ -52,7 +51,7 @@ public class GerenciadorPortas {
 		ExecutorService executor = Executors.newFixedThreadPool(portas.length);
 		ExecutorCompletionService<SerialPort> completion = new ExecutorCompletionService<>(executor);
 		
-		for (final String porta : SerialPortList.getPortNames()) {
+		for (final String porta : portas) {
 			completion.submit(new Callable<SerialPort>() {
 				@Override
 				public SerialPort call() throws Exception {
@@ -65,7 +64,7 @@ public class GerenciadorPortas {
 			try {
 				SerialPort porta = completion.take().get();
 				if (porta != null) {
-					executor.shutdownNow();
+					executor.shutdown();
 					this.porta = porta;
 					iniciarHeartbeat();
 					aplicarListener();
@@ -86,7 +85,7 @@ public class GerenciadorPortas {
 		try {
 			serial.openPort();
 			serial.setParams(baudRate, dataBits, stopBits, parity);
-			byte[] bytes = serial.readBytes(HANDSHAKE.length, TIMEOUT);
+			byte[] bytes = serial.readBytes(HANDSHAKE.length, TIMEOUT_HANDSHAKE);
 			if (Arrays.equals(bytes, HANDSHAKE)) {
 				if (serial.writeBytes(HANDSHAKE_OK)) {
 					return serial;
@@ -101,30 +100,13 @@ public class GerenciadorPortas {
 		return null;
 	}
 	
-	public String[] obterPortas() {
-		return SerialPortList.getPortNames();
-	}
-	
-	public boolean abrirPorta(String nomePorta) throws SerialPortException {
-		porta = new SerialPort(nomePorta);
-		if (porta.openPort()) {
-			if (porta.setParams(baudRate, dataBits, stopBits, parity)) {
-				iniciarHeartbeat();
-				aplicarListener();
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
 	private void iniciarHeartbeat() {
 		heartbeatTask = heartbeatThread.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				if (vivo) {
 					falhasHeartbeat++;
-					if (falhasHeartbeat > FALHAS_HEARTBEAT) {
+					if (falhasHeartbeat > LIMITE_FALHAS_HEARTBEAT) {
 						vivo = false;
 					}
 				}
@@ -161,7 +143,7 @@ public class GerenciadorPortas {
 						transferirBytes(buffer, bytesCompletos);
 						buffer.compact();
 						
-						if (Arrays.equals(bytesCompletos, HEARTBEAT_BOXED)) {
+						if (isHeartbeat(bytesCompletos)) {
 							falhasHeartbeat = 0;
 							vivo = true;
 							System.out.println("It's alive!");
@@ -184,12 +166,12 @@ public class GerenciadorPortas {
 		}
 	}
 	
-	private static Byte[] box(byte[] origem) {
-		Byte[] destino = new Byte[origem.length];
-		for (int i = 0; i < origem.length; i++) {
-			destino[i] = origem[i];
+	private static boolean isHeartbeat(Byte[] teste) {
+		if (teste.length != HEARTBEAT.length) return false;
+		for (int i = 0; i < teste.length; i++) {
+			if (teste[i] != HEARTBEAT[i]) return false;
 		}
-		return destino;
+		return true;
 	}
 	
 	public boolean fecharPorta() throws SerialPortException {

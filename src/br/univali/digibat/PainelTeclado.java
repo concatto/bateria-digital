@@ -1,7 +1,7 @@
 package br.univali.digibat;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -16,8 +16,8 @@ public class PainelTeclado extends PainelBase {
 		super(controlador);
 		
 		setFocusable(true);
-		painelEntrada.setLayout(new BorderLayout());
-		painelEntrada.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		painelEntrada.setPreferredSize(new Dimension(200, 100));
+		painelEntrada.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		painelEntrada.setFocusable(true);
 		final Instrumento[] instrumentos = {
 				Instrumento.SIDE_STICK,
