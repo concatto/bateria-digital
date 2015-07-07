@@ -36,10 +36,17 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 			sensor.atualizarForca(sinal);
 			
 			if (sensor.isPronto()) {
-				System.out.printf("Inst: %d. Forca: %d\n", sensor.getInstrumento(), sensor.getForcaMaxima());
-//				GerenciadorAudio.tocar(sensor.getInstrumento(), sensor.getForcaMaxima());
+				System.out.printf("Inst: %d. Forca: %d\n", sensor.getInstrumento(), converterForca(sensor.getForcaMaxima()));
+				if (sensor.getInstrumento() != -1) GerenciadorAudio.tocar(sensor.getInstrumento(), converterForca(sensor.getForcaMaxima()));
 				sensor.resetar();
 			}
 		}
+	}
+	
+	private int converterForca(int sinal) {
+		int forca = (sinal * 87 / 600) + 40;
+		if (forca > 127) forca = 127;
+		
+		return forca;
 	}
 }

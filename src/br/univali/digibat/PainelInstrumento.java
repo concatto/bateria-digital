@@ -36,12 +36,12 @@ public class PainelInstrumento extends JPanel {
 		return pin;
 	}
 	
-	public void onEscolherInstrumento(final Consumidor<Instrumento> acao) {
+	public void onEscolherInstrumento(final BiConsumidor<Integer, Instrumento> acao) {
 		instrumento.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {	
-					acao.consumir((Instrumento) e.getItem());
+					acao.consumir(getPin(), (Instrumento) e.getItem());
 				}
 			}
 		});

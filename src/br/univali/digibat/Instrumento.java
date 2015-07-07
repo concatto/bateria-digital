@@ -1,6 +1,7 @@
 package br.univali.digibat;
 
 public enum Instrumento {
+	NENHUM(-1, "<nenhum>"),
 	ACOUSTIC_BASS(35, "Bumbo acústico"),
 	BASS_DRUM(36, "Bumbo"),
 	SIDE_STICK(37, "Rimshot"),

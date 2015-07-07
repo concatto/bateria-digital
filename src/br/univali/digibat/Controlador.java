@@ -3,7 +3,7 @@ package br.univali.digibat;
 public class Controlador {	
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
-	private ConsumidorBateria consumidor;
+	private ConsumidorBateria consumidorBateria;
 	
 	public Controlador() {
 		gerenciador = new GerenciadorPortas(3);
@@ -16,19 +16,25 @@ public class Controlador {
 	}
 
 	public void alterarInterface(ModoInterface modo) {
-		userInterface.alterarModo(modo);
+		userInterface.setModo(modo);
 	}
 	
 	public void definirInstrumento(int pin, Instrumento instrumento) {
-		consumidor.definirInstrumento(pin, instrumento.getNota());
+		consumidorBateria.definirInstrumento(pin, instrumento.getNota());
 	}
 
 	public void inicializar() {
 		boolean sucesso = gerenciador.abrirExperimental();
 		if (sucesso) {
 			alterarInterface(ModoInterface.SENSORES);
-			consumidor = new ConsumidorBateria();
-			gerenciador.addConsumidor(consumidor);
+			consumidorBateria = new ConsumidorBateria();
+			userInterface.setConsumidorInstrumento(new BiConsumidor<Integer, Instrumento>() {
+				@Override
+				public void consumir(Integer t, Instrumento u) {
+					definirInstrumento(t, u);
+				}
+			});
+			gerenciador.addConsumidor(consumidorBateria);
 			gerenciador.addConsumidor(new Consumidor<Byte[]>() {
 				@Override
 				public void consumir(Byte[] t) {

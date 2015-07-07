@@ -1,7 +1,7 @@
 package br.univali.digibat;
 
 public class Sensor {
-	private static final int DELTA_FORCA = 5;
+	private static final int DELTA_FORCA = 50;
 	
 	private int instrumento;
 	private boolean pronto = false;

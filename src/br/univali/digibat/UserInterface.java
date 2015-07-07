@@ -21,6 +21,8 @@ public class UserInterface extends FrameBase {
 	private PainelSensores painelSensores;
 	private PainelTeclado painelTeclado;
 	
+	private ModoInterface modo;
+	
 	public UserInterface(Controlador controlador) {
 		super(controlador, "Digibat");
 		
@@ -35,7 +37,7 @@ public class UserInterface extends FrameBase {
 		exibirGrafico = new JMenuItem("Gráfico do Sinal");
 		menuBar = new JMenuBar();
 		
-		alterarModo(ModoInterface.SELECAO);
+		setModo(ModoInterface.SELECAO);
 		
 		arquivo.add(sair);
 		janela.add(exibirGrafico);
@@ -58,7 +60,12 @@ public class UserInterface extends FrameBase {
 		});
 	}
 	
-	public void alterarModo(ModoInterface modo) {
+	public void setModo(ModoInterface modo) {
+		this.modo = modo;
+		atualizarInterface();
+	}
+	
+	public void atualizarInterface() {
 		PainelBase painel;
 		
 		switch (modo) {
@@ -92,7 +99,12 @@ public class UserInterface extends FrameBase {
 		JOptionPane.showMessageDialog(this, e);
 	}
 
-	public void adicionarSinal(Byte byte1, int unirBytes) {
-		if (graficoSinal != null) graficoSinal.adicionarSinal(unirBytes, byte1);
+	public void adicionarSinal(Byte pin, int sinal) {
+		if (graficoSinal != null) graficoSinal.adicionarSinal(pin, sinal);
+	}
+	
+	public void setConsumidorInstrumento(BiConsumidor<Integer, Instrumento> consumidor) {
+		if (modo != ModoInterface.SENSORES) throw new IllegalStateException("O modo da interface não é SENSORES.");
+		painelSensores.setConsumidorInstrumento(consumidor);
 	}
 }

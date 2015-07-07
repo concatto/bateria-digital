@@ -45,7 +45,7 @@ public class GraficoSinal extends FrameBase {
 		tempo = System.currentTimeMillis();
 	}
 	
-	public void adicionarSinal(int sinal, int pin) {
+	public void adicionarSinal(int pin, int sinal) {
 		if (pin == 0) {
 			long y = System.currentTimeMillis() - tempo;
 			series.add(y, sinal);

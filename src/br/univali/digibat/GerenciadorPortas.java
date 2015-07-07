@@ -22,7 +22,7 @@ import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 
 public class GerenciadorPortas {
-	private static final int TIMEOUT_HANDSHAKE = 2500;
+	private static final int TIMEOUT_HANDSHAKE = 4000;
 	private static final byte[] HANDSHAKE = {85, 66, 68};
 	private static final byte[] HANDSHAKE_OK = {72, 79, 75};
 	private static final byte[] HEARTBEAT = {85, 78, 73};
@@ -95,6 +95,12 @@ public class GerenciadorPortas {
 			e.printStackTrace();
 		} catch (SerialPortTimeoutException e) {
 			System.out.println("Porta " + porta + " não respondeu.");
+		}
+		
+		try {
+			serial.closePort();
+		} catch (SerialPortException e) {
+			e.printStackTrace();
 		}
 		
 		return null;
