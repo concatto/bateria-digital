@@ -1,4 +1,4 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 import java.io.File;
 import java.io.IOException;

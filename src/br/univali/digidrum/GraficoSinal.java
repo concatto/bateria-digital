@@ -1,4 +1,4 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 import javax.swing.JPanel;
 
@@ -17,8 +17,8 @@ public class GraficoSinal extends FrameBase {
 	private JPanel root;
 	private long tempo;
 
-	public GraficoSinal(Controlador controlador) {
-		super(controlador, "Gráfico");
+	public GraficoSinal() {
+		super("Gráfico");
 	}
 
 	@Override

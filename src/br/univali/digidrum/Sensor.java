@@ -1,4 +1,4 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 public class Sensor {
 	private static final int DELTA_FORCA = 50;

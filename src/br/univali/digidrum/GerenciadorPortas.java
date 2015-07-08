@@ -1,4 +1,4 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -39,7 +40,7 @@ public class GerenciadorPortas {
 	
 	private ScheduledExecutorService heartbeatThread = Executors.newSingleThreadScheduledExecutor();
 	private ScheduledFuture<?> heartbeatTask;
-	private List<Consumidor<Byte[]>> consumidores = new ArrayList<>();
+	private List<Consumer<Byte[]>> consumidores = new ArrayList<>();
 	private SerialPort porta;
 	
 	public GerenciadorPortas(int tamanhoMensagem) {
@@ -154,8 +155,8 @@ public class GerenciadorPortas {
 							vivo = true;
 							System.out.println("It's alive!");
 						} else {
-							for (Consumidor<Byte[]> consumidor : consumidores) {
-								if (consumidor != null) consumidor.consumir(bytesCompletos);
+							for (Consumer<Byte[]> consumidor : consumidores) {
+								if (consumidor != null) consumidor.accept(bytesCompletos);
 							}
 						}
 					}
@@ -200,7 +201,7 @@ public class GerenciadorPortas {
 		return tamanhoMensagem;
 	}
 
-	public void addConsumidor(Consumidor<Byte[]> consumidor) {
+	public void addConsumidor(Consumer<Byte[]> consumidor) {
 		consumidores.add(consumidor);
 	}
 }

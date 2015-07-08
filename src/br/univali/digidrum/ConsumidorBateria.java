@@ -1,9 +1,10 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class ConsumidorBateria implements Consumidor<Byte[]> {
+public class ConsumidorBateria implements Consumer<Byte[]> {
 	private Map<Integer, Sensor> instrumentos = new HashMap<>();
 	
 	public ConsumidorBateria() {
@@ -24,7 +25,7 @@ public class ConsumidorBateria implements Consumidor<Byte[]> {
 	}
 	
 	@Override
-	public void consumir(Byte[] bytes) {
+	public void accept(Byte[] bytes) {
 		int sinal = unirBytes(bytes[1], bytes[2]);
 		
 		Sensor sensor = instrumentos.get((int) bytes[0]);

@@ -1,4 +1,4 @@
-package br.univali.digibat;
+package br.univali.digidrum;
 
 public enum Instrumento {
 	NENHUM(-1, "<nenhum>"),
