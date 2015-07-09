@@ -49,6 +49,9 @@ public class GerenciadorPortas {
 	
 	public boolean abrirExperimental() {
  		String[] portas = SerialPortList.getPortNames();
+ 		if (portas.length == 0) {
+ 			throw new IllegalStateException("Nenhuma porta encontrada. Permissão?");
+ 		}
 		ExecutorService executor = Executors.newFixedThreadPool(portas.length);
 		ExecutorCompletionService<SerialPort> completion = new ExecutorCompletionService<>(executor);
 		

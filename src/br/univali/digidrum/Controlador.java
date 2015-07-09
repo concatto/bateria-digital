@@ -1,16 +1,19 @@
 package br.univali.digidrum;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class Controlador {	
 	private UserInterface userInterface;
 	private GerenciadorPortas gerenciador;
 	private ConsumidorBateria consumidorBateria;
+	private Map<Integer, Sensor> sensores = new HashMap<>();
 	
 	public Controlador() {
+		sensores.put(0, new Sensor(Instrumento.ACOUSTIC_SNARE.getNota()));
 		gerenciador = new GerenciadorPortas(3);
 		userInterface = new UserInterface();
-		userInterface.setAcaoPin(System.out::println);
 		userInterface.onEstabelecerConexao(this::inicializar);
 		userInterface.setVisible(true);
 	}
@@ -22,7 +25,7 @@ public class Controlador {
 	public void inicializar() {
 		boolean sucesso = gerenciador.abrirExperimental();
 		if (sucesso) {
-			consumidorBateria = new ConsumidorBateria();
+			consumidorBateria = new ConsumidorBateria(sensores);
 			gerenciador.addConsumidor(consumidorBateria);
 			gerenciador.addConsumidor(new Consumer<Byte[]>() {
 				@Override

@@ -6,7 +6,7 @@ const byte HEARTBEAT[] = {85, 78, 73};
 const int led = 2;
 const int pins[] = {A0, A1, A2, A3, A4, A5};
 boolean ativo = false;
-int quantidadePins = 4;
+int quantidadePins = 1;
 
 time_t tempo;
 
@@ -28,12 +28,12 @@ void loop() {
     }
     for (int i = 0; i < quantidadePins; i++) {
       int forca = analogRead(pins[i]);
-    
+      Serial.println(forca);
       int len = 3;
       byte dados[len];
       mensagem(i, forca, dados);
       Serial.write(dados, len);
-      delay(10);
+      delay(5);
     }
   } else if (Serial.available() == 3) {
     boolean comparador = true;

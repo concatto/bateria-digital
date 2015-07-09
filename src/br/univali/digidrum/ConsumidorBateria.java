@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class ConsumidorBateria implements Consumer<Byte[]> {
-	private Map<Integer, Sensor> instrumentos = new HashMap<>();
+	private Map<Integer, Sensor> sensores = new HashMap<>();
 	
-	public ConsumidorBateria() {
+	public ConsumidorBateria(Map<Integer, Sensor> sensores) {
+		this.sensores = sensores;
 		GerenciadorAudio.iniciar();
 	}
 	
@@ -16,9 +17,9 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 	}
 	
 	public void definirInstrumento(int indice, int instrumento) {
-		Sensor sensor = instrumentos.get(indice);
+		Sensor sensor = sensores.get(indice);
 		if (sensor == null) {
-			instrumentos.put(indice, new Sensor(instrumento));
+			sensores.put(indice, new Sensor(instrumento));
 		} else {
 			sensor.setInstrumento(instrumento);
 		}
@@ -28,16 +29,12 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 	public void accept(Byte[] bytes) {
 		int sinal = unirBytes(bytes[1], bytes[2]);
 		
-		Sensor sensor = instrumentos.get((int) bytes[0]);
+		Sensor sensor = sensores.get((int) bytes[0]);
 		
 		if (sensor != null) {
-			int forca = (sinal * 87 / 600) + 40;
-			if (forca > 127) forca = 127;
-			
 			sensor.atualizarForca(sinal);
 			
 			if (sensor.isPronto()) {
-				System.out.printf("Inst: %d. Forca: %d\n", sensor.getInstrumento(), converterForca(sensor.getForcaMaxima()));
 				if (sensor.getInstrumento() != -1) GerenciadorAudio.tocar(sensor.getInstrumento(), converterForca(sensor.getForcaMaxima()));
 				sensor.resetar();
 			}
