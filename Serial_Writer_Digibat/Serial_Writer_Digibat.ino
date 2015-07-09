@@ -28,7 +28,6 @@ void loop() {
     }
     for (int i = 0; i < quantidadePins; i++) {
       int forca = analogRead(pins[i]);
-      Serial.println(forca);
       int len = 3;
       byte dados[len];
       mensagem(i, forca, dados);

@@ -22,8 +22,7 @@ public class PainelSensores extends JPanel {
 	private JPanel[] linhas = new JPanel[4];
 	
 	private List<PainelSensor> paineisInstrumento = new ArrayList<>();
-	private Consumer<Integer> acaoPin;
-	private Consumer<Instrumento> acaoInstrumento;
+	private Consumer<SensorEvent> listener;
 	
 	public PainelSensores() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -41,7 +40,7 @@ public class PainelSensores extends JPanel {
 	private void adicionarPainelInstrumento() {
 		int indice = paineisInstrumento.size();
 		int linha = indice / 4;
-		PainelSensor painel = new PainelSensor(acaoPin, acaoInstrumento);
+		PainelSensor painel = new PainelSensor(listener);
 		paineisInstrumento.add(painel);
 		
 		if (indice == linhas.length * 4) adicionarSensor.setEnabled(false);
@@ -70,16 +69,12 @@ public class PainelSensores extends JPanel {
 			acao.run();
 		});
 	}
-	
-	public void setAcaoPin(Consumer<Integer> acaoPin) {
-		this.acaoPin = acaoPin;
-	}
-	
-	public void setAcaoInstrumento(Consumer<Instrumento> acaoInstrumento) {
-		this.acaoInstrumento = acaoInstrumento;
-	}
 
 	public void habilitar() {
 		
+	}
+
+	public void setSensorListener(Consumer<SensorEvent> listener) {
+		this.listener = listener;
 	}
 }

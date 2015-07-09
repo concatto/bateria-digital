@@ -15,6 +15,9 @@ public class Controlador {
 		gerenciador = new GerenciadorPortas(3);
 		userInterface = new UserInterface();
 		userInterface.onEstabelecerConexao(this::inicializar);
+		userInterface.setSensorListener(e -> {
+			
+		});
 		userInterface.setVisible(true);
 	}
 	

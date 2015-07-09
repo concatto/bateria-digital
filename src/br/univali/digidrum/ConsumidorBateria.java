@@ -1,11 +1,10 @@
 package br.univali.digidrum;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class ConsumidorBateria implements Consumer<Byte[]> {
-	private Map<Integer, Sensor> sensores = new HashMap<>();
+	private Map<Integer, Sensor> sensores;
 	
 	public ConsumidorBateria(Map<Integer, Sensor> sensores) {
 		this.sensores = sensores;

@@ -73,20 +73,15 @@ public class UserInterface extends FrameBase {
 		if (graficoSinal != null) graficoSinal.adicionarSinal(pin, sinal);
 	}
 	
-	//TODO Melhorar esta ponte
 	public void onEstabelecerConexao(Runnable acao) {
 		painelSensores.onEstabelecerConexao(acao);
-	}
-	
-	public void setAcaoPin(Consumer<Integer> acaoPin) {
-		painelSensores.setAcaoPin(acaoPin);
-	}
-	
-	public void setAcaoInstrumento(Consumer<Instrumento> acaoInstrumento) {
-		painelSensores.setAcaoInstrumento(acaoInstrumento);
 	}
 
 	public void habilitar() {
 		painelSensores.habilitar();
+	}
+
+	public void setSensorListener(Consumer<SensorEvent> listener) {
+		painelSensores.setSensorListener(listener);
 	}
 }

@@ -3,6 +3,7 @@ package br.univali.digidrum;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
@@ -38,7 +39,7 @@ public class PainelSensor extends JPanel {
 	private SortedComboBoxModel<Instrumento> modeloInstrumento = new SortedComboBoxModel<>(Instrumento.values(), INSTRUMENTO_COMPARATOR);
 	private JComboBox<Instrumento> seletorInstrumento = new JComboBox<>(modeloInstrumento);
 	
-	public PainelSensor(Consumer<Integer> acaoPin, Consumer<Instrumento> acaoInstrumento) {
+	public PainelSensor(Consumer<SensorEvent> listener) {
 		add(labelPin);
 		add(Box.createRigidArea(new Dimension(0, 2)));
 		add(seletorPin);
@@ -54,19 +55,11 @@ public class PainelSensor extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		
-		seletorPin.addItemListener(e -> {
-			if (e.getStateChange() == ItemEvent.SELECTED) {
-				int indice = seletorPin.getSelectedIndex() - 1;
-				acaoPin.accept(indice); 
-			} else {
-				System.out.println("Anterior: " + e.getItem());
-			}
-		});
+		ItemListener itemListener = e -> {
+			
+		};
 		
-		seletorInstrumento.addItemListener(e -> {
-			if (e.getStateChange() == ItemEvent.SELECTED) {
-				acaoInstrumento.accept((Instrumento) e.getItem());
-			}
-		});
+		seletorPin.addItemListener(itemListener);
+		seletorInstrumento.addItemListener(itemListener);
 	}
 }
