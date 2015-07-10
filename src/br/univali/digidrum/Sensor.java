@@ -3,21 +3,21 @@ package br.univali.digidrum;
 public class Sensor {
 	private static final int DELTA_FORCA = 50;
 	
-	private int instrumento;
+	private Instrumento instrumento;
 	private boolean pronto = false;
 	private boolean preparando = false;
 	private int forca;
 	private int forcaMaxima;
 	
-	public Sensor(int instrumento) {
+	public Sensor(Instrumento instrumento) {
 		this.instrumento = instrumento;
 	}
 	
-	public int getInstrumento() {
+	public Instrumento getInstrumento() {
 		return instrumento;
 	}
 	
-	public void setInstrumento(int instrumento) {
+	public void setInstrumento(Instrumento instrumento) {
 		this.instrumento = instrumento;
 	}
 
@@ -43,5 +43,10 @@ public class Sensor {
 	
 	public int getForcaMaxima() {
 		return forcaMaxima;
+	}
+	
+	@Override
+	public String toString() {
+		return instrumento.toString();
 	}
 }

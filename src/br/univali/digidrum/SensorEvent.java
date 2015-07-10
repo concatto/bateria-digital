@@ -5,11 +5,11 @@ public class SensorEvent {
 	public static final int INSTRUMENTO_CHANGED = 2;
 	
 	private int tipo;
-	private byte pinAntigo;
-	private byte pinNovo;
+	private int pinAntigo;
+	private int pinNovo;
 	private Instrumento instrumento;
 	
-	public SensorEvent(int tipo, byte pinAntigo, byte pinNovo, Instrumento instrumento) {
+	public SensorEvent(int tipo, int pinAntigo, int pinNovo, Instrumento instrumento) {
 		this.tipo = tipo;
 		this.pinAntigo = pinAntigo;
 		this.pinNovo = pinNovo;
@@ -20,11 +20,11 @@ public class SensorEvent {
 		return tipo;
 	}
 	
-	public byte getPinAntigo() {
+	public int getPinAntigo() {
 		return pinAntigo;
 	}
 	
-	public byte getPinNovo() {
+	public int getPinNovo() {
 		return pinNovo;
 	}
 	

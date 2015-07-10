@@ -11,12 +11,19 @@ public class Controlador {
 	private Map<Integer, Sensor> sensores = new HashMap<>();
 	
 	public Controlador() {
-		sensores.put(0, new Sensor(Instrumento.ACOUSTIC_SNARE.getNota()));
 		gerenciador = new GerenciadorPortas(3);
 		userInterface = new UserInterface();
 		userInterface.onEstabelecerConexao(this::inicializar);
 		userInterface.setSensorListener(e -> {
-			
+			if (e.getTipo() == SensorEvent.PIN_CHANGED) {
+				Sensor removido = sensores.remove(e.getPinAntigo());
+				if (e.getPinNovo() != -1) {
+					if (removido == null) removido = new Sensor(e.getInstrumento());
+					sensores.put(e.getPinNovo(), removido);
+				}
+			} else {
+				sensores.get(e.getPinNovo()).setInstrumento(e.getInstrumento());
+			}
 		});
 		userInterface.setVisible(true);
 	}

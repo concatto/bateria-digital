@@ -15,15 +15,6 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 		return (primeiro & 0xFF) | ((segundo & 0xFF) << 8);
 	}
 	
-	public void definirInstrumento(int indice, int instrumento) {
-		Sensor sensor = sensores.get(indice);
-		if (sensor == null) {
-			sensores.put(indice, new Sensor(instrumento));
-		} else {
-			sensor.setInstrumento(instrumento);
-		}
-	}
-	
 	@Override
 	public void accept(Byte[] bytes) {
 		int sinal = unirBytes(bytes[1], bytes[2]);
@@ -34,7 +25,8 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 			sensor.atualizarForca(sinal);
 			
 			if (sensor.isPronto()) {
-				if (sensor.getInstrumento() != -1) GerenciadorAudio.tocar(sensor.getInstrumento(), converterForca(sensor.getForcaMaxima()));
+				Instrumento inst = sensor.getInstrumento();
+				if (inst.isValido()) GerenciadorAudio.tocar(inst.getNota(), converterForca(sensor.getForcaMaxima()));
 				sensor.resetar();
 			}
 		}

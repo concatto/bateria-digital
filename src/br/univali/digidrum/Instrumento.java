@@ -30,7 +30,7 @@ public enum Instrumento {
 	private String nome;
 	
 	Instrumento(int nota) {
-		this(nota, "<desconhecido>");
+		this(nota, "<desconhecido:" + nota + ">");
 	}
 	
 	Instrumento(int nota, String nome) {
@@ -44,6 +44,10 @@ public enum Instrumento {
 	
 	public String getNome() {
 		return nome;
+	}
+	
+	public boolean isValido() {
+		return nota != -1;
 	}
 	
 	@Override

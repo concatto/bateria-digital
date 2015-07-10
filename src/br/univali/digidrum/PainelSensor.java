@@ -28,8 +28,13 @@ public class PainelSensor extends JPanel {
 	};
 	
 	private static final Comparator<String> PIN_COMPARATOR = (primeiro, segundo) -> {
-		//TODO Desenvolver comparador onde <inativo> fica no topo
-		return 1;
+		if (primeiro.charAt(0) == '<') {
+			return -1;
+		} else {
+			int um = Integer.parseInt(primeiro);
+			int dois = Integer.parseInt(segundo);
+			return um > dois ? 1 : um == dois ? 0 : -1;
+		}
 	};
 	
 	private JLabel labelPin = new JLabel("Pin");
@@ -38,6 +43,8 @@ public class PainelSensor extends JPanel {
 	private JLabel labelInstrumento = new JLabel("Instrumento");
 	private SortedComboBoxModel<Instrumento> modeloInstrumento = new SortedComboBoxModel<>(Instrumento.values(), INSTRUMENTO_COMPARATOR);
 	private JComboBox<Instrumento> seletorInstrumento = new JComboBox<>(modeloInstrumento);
+	
+	int pinAntigo = -1;
 	
 	public PainelSensor(Consumer<SensorEvent> listener) {
 		add(labelPin);
@@ -56,7 +63,15 @@ public class PainelSensor extends JPanel {
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		
 		ItemListener itemListener = e -> {
-			
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				boolean pinMudou = e.getSource().equals(seletorPin);
+				int pinNovo = seletorPin.getSelectedIndex() - 1;
+				int tipo = pinMudou ? SensorEvent.PIN_CHANGED : SensorEvent.INSTRUMENTO_CHANGED;
+				Instrumento instrumento = (Instrumento) seletorInstrumento.getSelectedItem();
+				
+				listener.accept(new SensorEvent(tipo, pinAntigo, pinNovo, instrumento));
+				pinAntigo = pinNovo;
+			}
 		};
 		
 		seletorPin.addItemListener(itemListener);
