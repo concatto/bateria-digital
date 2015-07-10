@@ -1,5 +1,6 @@
 package br.univali.digidrum;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -29,6 +30,21 @@ public class Controlador {
 	}
 	
 	public static void main(String[] args) {
+		int[] test = {0, 5, 15, 15, 2, 9};
+		int[] r = new int[(int) Math.ceil(test.length / 2f)];
+		for (int i = 0; i < test.length; i++) {
+			int ri = i / 2;
+			if (i % 2 == 0) {
+				r[ri] = test[i] << 4;
+			} else {
+				r[ri] = r[ri] | test[i];
+			}
+		}
+		System.out.println("Enviar " + Arrays.toString(r));
+		for (int i : r) {
+			System.out.println(i >> 4);
+			System.out.println(i & 0xF);
+		}
 		new Controlador();
 	}
 
