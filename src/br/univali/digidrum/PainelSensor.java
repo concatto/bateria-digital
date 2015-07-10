@@ -28,7 +28,7 @@ public class PainelSensor extends JPanel {
 	};
 	
 	private static final Comparator<String> PIN_COMPARATOR = (primeiro, segundo) -> {
-		if (primeiro.charAt(0) == '<') {
+		if (primeiro.charAt(0) == '<' || segundo.charAt(0) == '<') {
 			return -1;
 		} else {
 			int um = Integer.parseInt(primeiro);
@@ -65,7 +65,7 @@ public class PainelSensor extends JPanel {
 		ItemListener itemListener = e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				boolean pinMudou = e.getSource().equals(seletorPin);
-				int pinNovo = seletorPin.getSelectedIndex() - 1;
+				int pinNovo = lerPinSelecionado();
 				int tipo = pinMudou ? SensorEvent.PIN_CHANGED : SensorEvent.INSTRUMENTO_CHANGED;
 				Instrumento instrumento = (Instrumento) seletorInstrumento.getSelectedItem();
 				
@@ -76,5 +76,19 @@ public class PainelSensor extends JPanel {
 		
 		seletorPin.addItemListener(itemListener);
 		seletorInstrumento.addItemListener(itemListener);
+	}
+
+	private int lerPinSelecionado() {
+		String s = (String) seletorPin.getSelectedItem();
+		if (s.charAt(0) == '<') return -1;
+		else return Integer.parseInt(s);
+	}
+
+	public void adicionarPin(int pin) {
+		if (pinAntigo != pin) modeloPin.addElement(PINS[++pin]);
+	}
+
+	public void removerPin(int pin) {
+		if (lerPinSelecionado() != pin)	modeloPin.removeElement(PINS[++pin]);
 	}
 }

@@ -75,10 +75,11 @@ public class PainelSensores extends JPanel {
 	}
 
 	public void setSensorListener(Consumer<SensorEvent> listener) {
-		this.listener = listener;
-		/*
-		 * TODO Desenvolver a remoção do novo pin selecionado caso não seja o <inativo>.
-		 * Possivelmente utilizar andThen() com um loop na lista paineisInstrumento.
-		 */
+		this.listener = listener.andThen(e -> {
+			for (PainelSensor p : paineisInstrumento) {
+				if (e.getPinNovo() != -1) p.removerPin(e.getPinNovo());
+				if (e.getPinAntigo() != -1) p.adicionarPin(e.getPinAntigo());
+			}
+		});
 	}
 }
