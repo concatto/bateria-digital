@@ -1,9 +1,11 @@
 package br.univali.digidrum;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import jssc.SerialPort;
+import jssc.SerialPortException;
 
 public class Controlador {	
 	private UserInterface userInterface;
@@ -29,22 +31,13 @@ public class Controlador {
 		userInterface.setVisible(true);
 	}
 	
+	//TODO transferir para o lugar certo
+	private static void protoEnviar(int msb, int lsb, SerialPort p) throws SerialPortException {
+		byte b = (byte) ((msb << 4) | lsb);
+		p.writeByte(b);
+	}
+	
 	public static void main(String[] args) {
-		int[] test = {0, 5, 15, 15, 2, 9};
-		int[] r = new int[(int) Math.ceil(test.length / 2f)];
-		for (int i = 0; i < test.length; i++) {
-			int ri = i / 2;
-			if (i % 2 == 0) {
-				r[ri] = test[i] << 4;
-			} else {
-				r[ri] = r[ri] | test[i];
-			}
-		}
-		System.out.println("Enviar " + Arrays.toString(r));
-		for (int i : r) {
-			System.out.println(i >> 4);
-			System.out.println(i & 0xF);
-		}
 		new Controlador();
 	}
 
