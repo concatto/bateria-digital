@@ -17,17 +17,22 @@ public class Controlador {
 		gerenciador = new GerenciadorPortas(3);
 		userInterface = new UserInterface();
 		userInterface.onEstabelecerConexao(this::inicializar);
+		
 		userInterface.setSensorListener(e -> {
 			if (e.getTipo() == SensorEvent.PIN_CHANGED) {
+				//Alteração no pin
 				Sensor removido = sensores.remove(e.getPinAntigo());
 				if (e.getPinNovo() != -1) {
+					//Se o antigo não existia, criar novo
 					if (removido == null) removido = new Sensor(e.getInstrumento());
 					sensores.put(e.getPinNovo(), removido);
 				}
 			} else {
+				//Alteração no instrumento
 				sensores.get(e.getPinNovo()).setInstrumento(e.getInstrumento());
 			}
 		});
+		
 		userInterface.setVisible(true);
 	}
 	
