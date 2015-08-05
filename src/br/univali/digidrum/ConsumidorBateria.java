@@ -5,19 +5,16 @@ import java.util.function.Consumer;
 
 public class ConsumidorBateria implements Consumer<Byte[]> {
 	private Map<Integer, Sensor> sensores;
+	private GerenciadorAudio audio;
 	
 	public ConsumidorBateria(Map<Integer, Sensor> sensores) {
 		this.sensores = sensores;
-		GerenciadorAudio.iniciar();
-	}
-	
-	public static int unirBytes(byte primeiro, byte segundo) {
-		return (primeiro & 0xFF) | ((segundo & 0xFF) << 8);
+		audio = new GerenciadorAudio();
 	}
 	
 	@Override
 	public void accept(Byte[] bytes) {
-		int sinal = unirBytes(bytes[1], bytes[2]);
+		int sinal = ByteUtils.unirBytes(bytes[1], bytes[2]);
 		
 		Sensor sensor = sensores.get((int) bytes[0]);
 		
@@ -25,17 +22,10 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 			sensor.atualizarForca(sinal);
 			
 			if (sensor.isPronto()) {
-				Instrumento inst = sensor.getInstrumento();
-				if (inst.isValido()) GerenciadorAudio.tocar(inst.getNota(), converterForca(sensor.getForcaMaxima()));
+				Instrumento instr = sensor.getInstrumento();
+				if (instr.isValido()) audio.tocar(instr.getNota(), ByteUtils.sinalParaByte(sensor.getForcaMaxima()));
 				sensor.resetar();
 			}
 		}
-	}
-	
-	private int converterForca(int sinal) {
-		int forca = (sinal * 87 / 600) + 40;
-		if (forca > 127) forca = 127;
-		
-		return forca;
 	}
 }

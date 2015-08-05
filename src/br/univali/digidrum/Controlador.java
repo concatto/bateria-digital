@@ -2,7 +2,6 @@ package br.univali.digidrum;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -37,7 +36,7 @@ public class Controlador {
 	}
 	
 	//TODO transferir para o lugar certo
-	private static void protoEnviar(int msb, int lsb, SerialPort p) throws SerialPortException {
+	public static void protoEnviar(int msb, int lsb, SerialPort p) throws SerialPortException {
 		byte b = (byte) ((msb << 4) | lsb);
 		p.writeByte(b);
 	}
@@ -50,13 +49,9 @@ public class Controlador {
 		boolean sucesso = gerenciador.abrirExperimental();
 		if (sucesso) {
 			consumidorBateria = new ConsumidorBateria(sensores);
+			
 			gerenciador.addConsumidor(consumidorBateria);
-			gerenciador.addConsumidor(new Consumer<Byte[]>() {
-				@Override
-				public void accept(Byte[] t) {
-					userInterface.adicionarSinal(t[0], ConsumidorBateria.unirBytes(t[1], t[2]));
-				}
-			});
+			gerenciador.addConsumidor(t -> userInterface.adicionarSinal(t[0], ByteUtils.unirBytes(t[1], t[2])));
 			
 			userInterface.habilitar();
 		} else {

@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
@@ -50,18 +47,13 @@ public class GerenciadorPortas {
 	public boolean abrirExperimental() {
  		String[] portas = SerialPortList.getPortNames();
  		if (portas.length == 0) {
- 			throw new IllegalStateException("Nenhuma porta encontrada. Permissão?");
+ 			throw new IllegalStateException("Nenhuma porta encontrada. Verifique as permissões.");
  		}
 		ExecutorService executor = Executors.newFixedThreadPool(portas.length);
 		ExecutorCompletionService<SerialPort> completion = new ExecutorCompletionService<>(executor);
 		
 		for (final String porta : portas) {
-			completion.submit(new Callable<SerialPort>() {
-				@Override
-				public SerialPort call() throws Exception {
-					return tentarAbrir(porta);
-				}
-			});
+			completion.submit(() -> tentarAbrir(porta));
 		}
 		
 		for (int i = 0; i < portas.length; i++) {
@@ -84,28 +76,20 @@ public class GerenciadorPortas {
 		return false;
 	}
 	
-	private SerialPort tentarAbrir(String porta) {
+	private SerialPort tentarAbrir(String porta) throws SerialPortException, SerialPortTimeoutException {
 		SerialPort serial = new SerialPort(porta);
-		try {
-			serial.openPort();
-			serial.setParams(baudRate, dataBits, stopBits, parity);
-			byte[] bytes = serial.readBytes(HANDSHAKE.length, TIMEOUT_HANDSHAKE);
-			if (Arrays.equals(bytes, HANDSHAKE)) {
-				if (serial.writeBytes(HANDSHAKE_OK)) {
-					return serial;
-				}
+		serial.openPort();
+		serial.setParams(baudRate, dataBits, stopBits, parity);
+		
+		byte[] bytes = serial.readBytes(HANDSHAKE.length, TIMEOUT_HANDSHAKE);
+		if (Arrays.equals(bytes, HANDSHAKE)) {
+			if (serial.writeBytes(HANDSHAKE_OK)) {
+				return serial;
 			}
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		} catch (SerialPortTimeoutException e) {
-			System.out.println("Porta " + porta + " não respondeu.");
 		}
 		
-		try {
-			serial.closePort();
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
+		//Se chegarmos aqui, então o processo de handshake falhou
+		serial.closePort();
 		
 		return null;
 	}
@@ -135,47 +119,37 @@ public class GerenciadorPortas {
 	private void aplicarListener() throws SerialPortException {
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(TAMANHO_BUFFER);
 		
-		porta.addEventListener(new SerialPortEventListener() {
-			@Override
-			public void serialEvent(SerialPortEvent serialPortEvent) {
-				try {
-					byte[] bytes = porta.readBytes(serialPortEvent.getEventValue());
-					try {
-						buffer.put(bytes);
-					} catch (BufferOverflowException e) {
-						e.printStackTrace();
-						vivo = false;
+		porta.addEventListener(serialPortEvent -> {
+			try {
+				byte[] bytes = porta.readBytes(serialPortEvent.getEventValue());
+				buffer.put(bytes);
+			} catch (SerialPortException | BufferOverflowException e) {
+				e.printStackTrace();
+				//Problemas na leitura, interromper a conexão
+				vivo = false;
+				return;
+			}
+			
+			while (buffer.position() > tamanhoMensagem) {
+				Byte[] bytesCompletos = new Byte[tamanhoMensagem];
+				buffer.flip();
+				ByteUtils.bufferParaBytes(buffer, bytesCompletos);
+				buffer.compact();
+				
+				if (isHeartbeat(bytesCompletos)) {
+					falhasHeartbeat = 0;
+					vivo = true;
+					System.out.println("It's alive!");
+				} else {
+					for (Consumer<Byte[]> consumidor : consumidores) {
+						if (consumidor != null) consumidor.accept(bytesCompletos);
 					}
-					
-					while (buffer.position() > tamanhoMensagem) {
-						Byte[] bytesCompletos = new Byte[tamanhoMensagem];
-						buffer.flip();
-						transferirBytes(buffer, bytesCompletos);
-						buffer.compact();
-						
-						if (isHeartbeat(bytesCompletos)) {
-							falhasHeartbeat = 0;
-							vivo = true;
-							System.out.println("It's alive!");
-						} else {
-							for (Consumer<Byte[]> consumidor : consumidores) {
-								if (consumidor != null) consumidor.accept(bytesCompletos);
-							}
-						}
-					}
-				} catch (SerialPortException e) {
-					e.printStackTrace();
 				}
 			}
 		});
 	}
 	
-	private static void transferirBytes(ByteBuffer origem, Byte[] destino) {
-		for (int i = 0; i < destino.length; i++) {
-			destino[i] = origem.get();
-		}
-	}
-	
+	//TODO converter para uma classe que identifica o comando
 	private static boolean isHeartbeat(Byte[] teste) {
 		if (teste.length != HEARTBEAT.length) return false;
 		for (int i = 0; i < teste.length; i++) {

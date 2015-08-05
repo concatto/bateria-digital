@@ -12,10 +12,11 @@ import javax.swing.JPanel;
 public class FrameTeclado extends FrameBase {
 	private JPanel raiz;
 	private JPanel painelEntrada;
+	private GerenciadorAudio audio;
 
 	public FrameTeclado() {
 		super("Controlador");
-		GerenciadorAudio.iniciar();
+		audio = new GerenciadorAudio(); //temporário
 	}
 	
 	@Override
@@ -45,7 +46,7 @@ public class FrameTeclado extends FrameBase {
 			public void keyPressed(KeyEvent e) {
 				int nota = Character.getNumericValue(e.getKeyChar());
 				if (nota >= 0 && nota < instrumentos.length) {
-					GerenciadorAudio.tocar(instrumentos[nota].getNota(), 127);
+					audio.tocar(instrumentos[nota].getNota(), 127);
 				}
 			}
 		});

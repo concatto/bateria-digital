@@ -13,12 +13,10 @@ import javax.sound.midi.Soundbank;
 import javax.sound.midi.Synthesizer;
 
 public class GerenciadorAudio {
-	private static Synthesizer synth;
-	private static MidiChannel canal;
+	private Synthesizer synth;
+	private MidiChannel canal;
 	
-	public static void iniciar() {
-		if (synth != null) return;
-		
+	public GerenciadorAudio() {		
 		try {
 			synth = MidiSystem.getSynthesizer();
 			File file = new File(GerenciadorAudio.class.getClassLoader().getResource("res/FluidR3.SF2").toURI());
@@ -43,7 +41,7 @@ public class GerenciadorAudio {
 		}
 	}
 	
-	public static void tocar(int nota, int forca) {
+	public void tocar(int nota, int forca) {
 		canal.noteOn(nota, forca);
 	}
 	
