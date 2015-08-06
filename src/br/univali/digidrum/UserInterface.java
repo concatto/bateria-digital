@@ -1,5 +1,6 @@
 package br.univali.digidrum;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.swing.JMenu;
@@ -69,8 +70,8 @@ public class UserInterface extends FrameBase {
 		JOptionPane.showMessageDialog(this, e);
 	}
 
-	public void adicionarSinal(Byte pin, int sinal) {
-		if (graficoSinal != null) graficoSinal.adicionarSinal(pin, sinal);
+	public Optional<GraficoSinal> getGraficoSinal() {
+		return Optional.ofNullable(graficoSinal);
 	}
 	
 	public void onEstabelecerConexao(Runnable acao) {
