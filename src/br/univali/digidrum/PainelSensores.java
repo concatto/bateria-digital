@@ -65,9 +65,7 @@ public class PainelSensores extends JPanel {
 	}
 	
 	public void onEstabelecerConexao(Runnable acao) {
-		estabelecerConexao.addActionListener(e -> {
-			acao.run();
-		});
+		estabelecerConexao.addActionListener(e -> acao.run());
 	}
 
 	public void habilitar() {

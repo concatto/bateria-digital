@@ -38,10 +38,10 @@ public class PainelSensor extends JPanel {
 	};
 	
 	private JLabel labelPin = new JLabel("Pin");
-	private SortedComboBoxModel<String> modeloPin = new SortedComboBoxModel<>(PINS, PIN_COMPARATOR);
-	private JComboBox<String> seletorPin = new JComboBox<>(modeloPin);
 	private JLabel labelInstrumento = new JLabel("Instrumento");
+	private SortedComboBoxModel<String> modeloPin = new SortedComboBoxModel<>(PINS, PIN_COMPARATOR);
 	private SortedComboBoxModel<Instrumento> modeloInstrumento = new SortedComboBoxModel<>(Instrumento.values(), INSTRUMENTO_COMPARATOR);
+	private JComboBox<String> seletorPin = new JComboBox<>(modeloPin);
 	private JComboBox<Instrumento> seletorInstrumento = new JComboBox<>(modeloInstrumento);
 	
 	int pinAntigo = -1;
@@ -80,8 +80,7 @@ public class PainelSensor extends JPanel {
 
 	private int lerPinSelecionado() {
 		String s = (String) seletorPin.getSelectedItem();
-		if (s.charAt(0) == '<') return -1;
-		else return Integer.parseInt(s);
+		return (s.charAt(0) == '<') ? -1 : Integer.parseInt(s);
 	}
 
 	public void adicionarPin(int pin) {

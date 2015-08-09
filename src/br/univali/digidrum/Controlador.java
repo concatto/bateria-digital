@@ -51,7 +51,11 @@ public class Controlador {
 			consumidorBateria = new ConsumidorBateria(sensores);
 			
 			gerenciador.addConsumidor(consumidorBateria);
-			gerenciador.addConsumidor(t -> userInterface.adicionarSinal(t[0], ByteUtils.unirBytes(t[1], t[2])));
+			gerenciador.addConsumidor(bytes -> {
+				userInterface.getGraficoSinal().ifPresent(grafico -> {
+					grafico.adicionarSinal(bytes[0], ByteUtils.unirBytes(bytes[1], bytes[2]));
+				});
+			});
 			
 			userInterface.habilitar();
 		} else {
