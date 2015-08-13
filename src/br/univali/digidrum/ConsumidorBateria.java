@@ -3,7 +3,7 @@ package br.univali.digidrum;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class ConsumidorBateria implements Consumer<Byte[]> {
+public class ConsumidorBateria implements Consumer<Mensagem> {
 	private Map<Integer, Sensor> sensores;
 	private GerenciadorAudio audio;
 	
@@ -13,13 +13,11 @@ public class ConsumidorBateria implements Consumer<Byte[]> {
 	}
 	
 	@Override
-	public void accept(Byte[] bytes) {
-		int sinal = ByteUtils.unirBytes(bytes[1], bytes[2]);
-		
-		Sensor sensor = sensores.get((int) bytes[0]);
+	public void accept(Mensagem mensagem) {		
+		Sensor sensor = sensores.get(mensagem.getPin());
 		
 		if (sensor != null) {
-			sensor.atualizarForca(sinal);
+			sensor.atualizarForca(mensagem.getForca());
 			
 			if (sensor.isPronto()) {
 				Instrumento instr = sensor.getInstrumento();
