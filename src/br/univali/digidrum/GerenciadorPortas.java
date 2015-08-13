@@ -28,7 +28,7 @@ public class GerenciadorPortas {
 	private SerialPort porta;
 	
 	public GerenciadorPortas() {
-		decodificador.onKeepalive(keepaliveService::receber);
+		decodificador.onKeepalive(() -> keepaliveService.receber());
 		decodificador.onMensagem(msg -> consumidores.forEach(c -> c.accept(msg)));
 	}
 	

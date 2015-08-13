@@ -43,7 +43,7 @@ public class PainelSensores extends JPanel {
 		PainelSensor painel = new PainelSensor(listener);
 		paineisInstrumento.add(painel);
 		
-		if (indice == linhas.length * 4) adicionarSensor.setEnabled(false);
+		if (indice + 1 == linhas.length * 4) adicionarSensor.setEnabled(false);
 		
 		if (linhas[linha] == null) {
 			linhas[linha] = new JPanel();

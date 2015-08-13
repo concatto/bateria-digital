@@ -1,5 +1,6 @@
 package br.univali.digidrum;
 
+import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -11,11 +12,13 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 	private static final long INTERVALO_PADRAO = 1000;
 	private static final int TOLERANCIA_PADRAO = 3;
 	
+	private Runnable falhaAction;
 	private SerialPort porta;
 	private boolean ativo = false;
 	private long intervalo;
 	private int falhas = 0;
 	private int tolerancia;
+	private ScheduledFuture<?> future;
 	
 	public KeepaliveService(SerialPort porta) {
 		this(porta, INTERVALO_PADRAO, TOLERANCIA_PADRAO);
@@ -29,6 +32,7 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 	}
 	
 	public void receber() {
+		System.out.println("Keepalive recebido");
 		falhas = 0;
 	}
 	
@@ -40,7 +44,7 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 		Runnable acao = () -> {
 			if (falhas > tolerancia) {
 				ativo = false;
-				//Explodir
+				if (falhaAction != null) falhaAction.run();
 			}
 			
 			try {
@@ -51,11 +55,19 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 			}
 		};
 		
-		ScheduledFuture<?> future = scheduleAtFixedRate(acao, 0, intervalo, TimeUnit.MILLISECONDS);
+		future = scheduleAtFixedRate(acao, 0, intervalo, TimeUnit.MILLISECONDS);
 		ativo = true;
+	}
+	
+	public void parar() {
+		Objects.requireNonNull(future).cancel(true);
 	}
 	
 	public boolean isAtivo() {
 		return ativo;
+	}
+	
+	public void onFalha(Runnable falhaAction) {
+		this.falhaAction = falhaAction;
 	}
 }

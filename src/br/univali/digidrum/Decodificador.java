@@ -36,7 +36,7 @@ public class Decodificador {
 		} else {
 			switch ((dado & 0xFF) >> 4) {
 			case Protocolo.KEEPALIVE:
-				if ((dado & 0xF) == 0 && keepaliveAction != null) {
+				if (((dado & 0xF) == 0) && keepaliveAction != null) {
 					keepaliveAction.run();
 				}
 				
