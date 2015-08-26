@@ -13,11 +13,11 @@ public class ConsumidorBateria implements Consumer<Mensagem> {
 	}
 	
 	@Override
-	public void accept(Mensagem mensagem) {		
+	public void accept(Mensagem mensagem) {
 		Sensor sensor = sensores.get(mensagem.getPin());
 		
 		if (sensor != null) {
-			sensor.atualizarForca(mensagem.getForca());
+			sensor.atualizarForca(mensagem.getDado());
 			
 			if (sensor.isPronto()) {
 				Instrumento instr = sensor.getInstrumento();

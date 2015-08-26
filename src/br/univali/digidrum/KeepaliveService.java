@@ -1,6 +1,5 @@
 package br.univali.digidrum;
 
-import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +31,6 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 	}
 	
 	public void receber() {
-		System.out.println("Keepalive recebido");
 		falhas = 0;
 	}
 	
@@ -48,7 +46,7 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 			}
 			
 			try {
-				ativo = porta.writeByte(Protocolo.KEEPALIVE);
+				ativo = porta.writeByte((byte) (Protocolo.KEEPALIVE << 4));
 			} catch (SerialPortException e) {
 				e.printStackTrace();
 				ativo = false;
@@ -60,7 +58,8 @@ public class KeepaliveService extends ScheduledThreadPoolExecutor {
 	}
 	
 	public void parar() {
-		Objects.requireNonNull(future).cancel(true);
+		if (future == null) throw new IllegalStateException("O serviço não foi iniciado.");
+		future.cancel(true);
 	}
 	
 	public boolean isAtivo() {

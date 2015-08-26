@@ -30,7 +30,7 @@ public class Decodificador {
 	
 	public void decodificar(byte dado) {
 		if (proximoForca) {
-			mensagem.setDados(pin, dado);
+			mensagem.setAtributos(pin, dado & 0xFF);
 			mensagemAction.accept(mensagem);
 			proximoForca = false;
 		} else {

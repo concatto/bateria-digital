@@ -31,7 +31,7 @@ public class GraficoSinal extends FrameBase {
 		
 		dataset.addSeries(series);
 		root.add(chartPanel);
-		chart.getXYPlot().getRangeAxis().setUpperBound(1100);
+		chart.getXYPlot().getRangeAxis().setUpperBound(256);
 		
 		setContentPane(root);
 	}

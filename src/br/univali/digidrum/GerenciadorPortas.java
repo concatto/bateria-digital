@@ -20,7 +20,6 @@ public class GerenciadorPortas {
 	private int dataBits = SerialPort.DATABITS_8;
 	private int stopBits = SerialPort.STOPBITS_1;
 	private int parity = SerialPort.PARITY_NONE;
-	private byte tamanhoMensagem;
 
 	private List<Consumer<Mensagem>> consumidores = new ArrayList<>();
 	private Decodificador decodificador = new Decodificador();
@@ -28,8 +27,7 @@ public class GerenciadorPortas {
 	private SerialPort porta;
 	
 	public GerenciadorPortas() {
-		decodificador.onKeepalive(() -> keepaliveService.receber());
-		decodificador.onMensagem(msg -> consumidores.forEach(c -> c.accept(msg)));
+		
 	}
 	
 	public boolean abrirExperimental() {
@@ -48,12 +46,14 @@ public class GerenciadorPortas {
 			try {
 				SerialPort porta = completion.take().get();
 				if (porta != null) {
-					executor.shutdown();
+					executor.shutdownNow();
 					this.porta = porta;
 					iniciarComunicacao();
 					return true;
 				}
-			} catch (InterruptedException | ExecutionException e) {
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
 				e.printStackTrace();
 			} catch (SerialPortException e) {
 				e.printStackTrace();
@@ -63,25 +63,38 @@ public class GerenciadorPortas {
 		return false;
 	}
 	
-	private SerialPort tentarAbrir(String porta) throws SerialPortException, SerialPortTimeoutException {
+	private SerialPort tentarAbrir(String porta) throws SerialPortException {
 		SerialPort serial = new SerialPort(porta);
 		serial.openPort();
 		serial.setParams(baudRate, dataBits, stopBits, parity);
+		byte[] bytes;
 		
-		byte[] bytes = serial.readBytes(1, TIMEOUT_HANDSHAKE);
-		byte tamanhoMensagem = decodificador.testarHandshake(bytes[0]);
-		if (tamanhoMensagem != -1) {
-			this.tamanhoMensagem = tamanhoMensagem;
-			return serial;
+		try {
+			bytes = serial.readBytes(1, TIMEOUT_HANDSHAKE);
+		} catch (SerialPortTimeoutException e) {
+			if (!Thread.currentThread().isInterrupted()) e.printStackTrace();
+			System.out.println(Thread.interrupted());
+			serial.closePort();
+			return null;
 		}
 		
-		//Se chegarmos aqui, então o processo de handshake falhou
-		serial.closePort();
-		return null;
+		byte mensagemHandshake = decodificador.testarHandshake(bytes[0]);
+		if (mensagemHandshake != -1) {
+			//Caso necessário, realizar alguma ação com a mensagem
+			return serial;
+		} else {
+			serial.closePort();
+			return null;
+		}
 	}
 
 	private void iniciarComunicacao() throws SerialPortException {
 		keepaliveService = new KeepaliveService(porta);
+		
+		decodificador.onKeepalive(() -> keepaliveService.receber());
+		decodificador.onMensagem(msg -> consumidores.forEach(c -> c.accept(msg)));
+		
+		keepaliveService.iniciar();
 		
 		porta.addEventListener(serialPortEvent -> {
 			try {
@@ -97,10 +110,6 @@ public class GerenciadorPortas {
 		/* Curto circuito importante */
 		if (porta == null || !porta.isOpened()) throw new IllegalStateException("A porta não está aberta.");
 		return porta.closePort();
-	}
-	
-	public int getTamanhoMensagem() {
-		return tamanhoMensagem;
 	}
 
 	public void addConsumidor(Consumer<Mensagem> consumidor) {

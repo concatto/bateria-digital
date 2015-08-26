@@ -41,10 +41,11 @@ public class Controlador {
 		if (sucesso) {
 			consumidorBateria = new ConsumidorBateria(sensores);
 			
-			gerenciador.addConsumidor(consumidorBateria);
+//			gerenciador.addConsumidor(System.out::println);
+//			gerenciador.addConsumidor(consumidorBateria);
 			gerenciador.addConsumidor(msg -> {
 				userInterface.getGraficoSinal().ifPresent(grafico -> {
-					grafico.adicionarSinal(msg.getPin(), msg.getForca());
+					grafico.adicionarSinal(msg.getPin(), msg.getDado());
 				});
 			});
 			
